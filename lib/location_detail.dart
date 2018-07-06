@@ -77,7 +77,6 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
 
   @override
   void onLoadLocation(Location location){
-    this.location = location;
     container.onFocusLocation = location;
     isSearching = false;
     
@@ -90,12 +89,15 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
   }
 
   @override
-  void onChangeState(Location location, String device_uid){
+  void onChangeState(Location location){
     for(int i = 0; i<container.locations.length; i++){
-      if(container.locations[i].uid == location.uid){
+      if(container.locations[i].isEqualWithLocation(location)){
         container.locations[i] = location;
       }
     }
+    setState(() {
+      this.devices = location.devices;      
+    });
   }
 
   @override

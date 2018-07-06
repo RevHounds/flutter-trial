@@ -14,7 +14,7 @@ abstract class AddLocationContract{
 
 abstract class LocationDetailContract{
   void onLoadLocation(Location location);
-  void onChangeState(Location location, String device_uid);
+  void onChangeState(Location location);
 }
 
 class LocationListPresenter{
@@ -79,7 +79,7 @@ class LocationDetailPresenter{
     String device_uid = device.uid;
     _repo.changeDeviceStateOnLocation(location_uid, device_uid)
         .then((location){
-          _view.onChangeState(location, device_uid);
+          _view.onChangeState(location);
         });
   }
 }

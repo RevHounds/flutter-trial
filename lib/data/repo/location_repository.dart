@@ -35,9 +35,7 @@ class MockLocationRepository implements LocationRepository{
   @override
   Future<Location> getLocationByUID(String uid){
     for (var location in locations) {
-      String locationUID = location.uid;
-      print("$locationUID is same with $uid");
-      if(location.uid == uid) 
+      if(location.isEqualWithUID(uid)) 
         return Future.value(location);
     }
     return Future.value(null);
@@ -50,12 +48,11 @@ class MockLocationRepository implements LocationRepository{
 
   @override
   Future<List<Location>> addDeviceOnLocation(Device device, Location location){
-    String uid = location.uid;
     String name = location.name;
     print("adding device to $name");
 
     for (int i = 0; i < locations.length; i++) {
-      if(uid == locations[i].uid){
+      if(locations[i].isEqualWithLocation(location)){
         locations[i].devices.add(device);
         return Future.value(locations);
       }
@@ -72,19 +69,21 @@ class MockLocationRepository implements LocationRepository{
 
   @override
   Future<Location> changeDeviceStateOnLocation(String location_uid, String device_uid){
-    Location locationFound;
+    Location locationFound = null;
     
     for (var location in locations) {
-      if(location.uid == location_uid){
+      if(location.isEqualWithUID(location_uid)){
         for(var device in location.devices){
           if(device.uid == device_uid){
+            String name = location.name;
+            print("location found, device state changed on $name");
             device.status = !device.status;
+            locationFound = location;
+            return Future.value(locationFound);
           }
         }
-        locationFound = location;
       }
     }
-    Future.value(locationFound);
+    return Future.value(null);
   }
-
 }

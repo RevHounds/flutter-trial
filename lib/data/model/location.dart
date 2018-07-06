@@ -18,6 +18,14 @@ class Location{
     print("Try make location");
     return new Location(view.ip, view.name, view.picture);
   }
+
+  bool isEqualWithLocation(Location anotherLocation){
+    return this.uid == anotherLocation.uid;
+  }
+
+  bool isEqualWithUID(String uid){
+    return this.uid == uid;
+  }
 }
 
 class LocationView extends Location{
