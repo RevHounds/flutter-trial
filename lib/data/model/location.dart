@@ -8,11 +8,11 @@ class Location{
 
   List<Device> devices;
 
-	Location(
-			this.ip,
-			this.name,
-			this.picture
-		) : uid = new IDGenerator().generateUID();
+	Location(this.ip, this.name, this.picture) {
+      uid = new IDGenerator().generateUID();
+      devices = new List<Device>();
+      devices.add(new Device(name: "Lampu Depan"));
+    }
 
   static Location fromView(LocationAddView view)  {
     print("Try make location");
@@ -37,9 +37,10 @@ class Device{
   String uid;
   String name;
   bool status;
-
+  String icon;
   Device({
     this.name,
+    this.icon = "lightbulb_outline",
     this.status = false
   }) : uid = new IDGenerator().generateUID();
 }

@@ -3,9 +3,9 @@ import '../data/model/location.dart';
 
 
 class StateContainer extends StatefulWidget{
-
-  final List<Location> locations;
-  final Widget child;
+  Location onFocusLocation;
+  List<Location> locations;
+  Widget child;
   
   StateContainer(this.child) : locations = new List();
 
@@ -20,6 +20,7 @@ class StateContainer extends StatefulWidget{
 
 class StateContainerState extends State<StateContainer>{
   List<Location> locations;
+  Location onFocusLocation;
   int count;
 
   @override
@@ -29,9 +30,20 @@ class StateContainerState extends State<StateContainer>{
     count = 1;
 
     return new InheritedStateContainer(
-      this,       //data passed down
-      widget.child //child
+      this,         //data passed down
+      widget.child  //child
     );
+  }
+
+  
+  Location findLocationByUID(String uid){
+    for (var location in locations) {
+      if(location.uid == uid){
+        onFocusLocation = location;
+        return location;
+      }
+        
+    }
   }
   
 }

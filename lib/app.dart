@@ -3,6 +3,7 @@ import 'view/location_presenter.dart';
 import 'data/model/location.dart';
 import 'utils/container.dart';
 import './add_location_page.dart';
+import 'location_detail.dart';
 
 class Myapp extends StatelessWidget{
   @override
@@ -122,19 +123,41 @@ class LocationListState extends State<LocationList> implements LocationListContr
 }
 
 
-class LocationCard extends Card{
+class LocationCard extends StatelessWidget{
   final Location _location;
 
-  LocationCard(this._location) : super(
-    child: new Column(
-      children: <Widget>[
-        new Image.network(
-            _location.picture,
-            scale: 0.8,
-            height: 150.0,
-            width: 150.0),
-        new Text(_location.name)
-      ],
-    )
-  );
+  @override
+  Widget build(BuildContext context){
+    return new Card(
+      child: new FlatButton(
+        onPressed: (){_gotoLocationDetail(context, _location);},
+        child: new Column(
+          children: <Widget>[
+            new Image.network(
+                _location.picture,
+                scale: 0.8,
+                height: 150.0,
+                width: 150.0),
+            new Text(_location.name)
+          ]
+        )
+      )
+    );
+  }
+
+  LocationCard(this._location);
+
+  void _gotoLocationDetail(BuildContext context, Location location){
+    print(location.uid);
+    Navigator.push(
+      context, 
+      new MaterialPageRoute(
+        settings: new RouteSettings(name: LocationDetail.routeName),
+        builder: 
+          (context){
+            return new LocationDetail(location.uid);
+          }
+      )
+    );
+  }
 }

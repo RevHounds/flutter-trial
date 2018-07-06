@@ -12,6 +12,11 @@ abstract class AddLocationContract{
   void onSaveLocation(List<Location> locations);
 }
 
+abstract class LocationDetailContract{
+  void onLoadLocation(Location location);
+  void onChangeState(Location location, String device_uid);
+}
+
 class LocationListPresenter{
   LocationListContract _view;
   LocationRepository _repo;
@@ -49,5 +54,32 @@ class AddLocationPresenter{
       print("Location saved! count: $n");
       _view.onSaveLocation(locations);
     });
+  }
+}
+
+class LocationDetailPresenter{
+  LocationRepository _repo;
+  LocationDetailContract _view;
+
+  LocationDetailPresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void loadLocationByUID(String uid){
+    print("ini lagi cobain cari si $uid");
+    _repo.getLocationByUID(uid)
+      .then((location){
+        print("location found!");
+        _view.onLoadLocation(location);
+      });
+  }
+
+  void changeState(Location location, Device device){
+    String location_uid = location.uid;
+    String device_uid = device.uid;
+    _repo.changeDeviceStateOnLocation(location_uid, device_uid)
+        .then((location){
+          _view.onChangeState(location, device_uid);
+        });
   }
 }
