@@ -46,9 +46,11 @@ class Device{
   String name;
   bool status;
   String icon;
+  String description;
   Device({
     this.name,
     this.icon = "lightbulb_outline",
-    this.status = false
+    this.status = false,
+    this.description = "None"
   }) : uid = new IDGenerator().generateUID();
 }

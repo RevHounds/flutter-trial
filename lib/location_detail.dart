@@ -111,40 +111,102 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
     container = StateContainer.of(context);
     location = container.onFocusLocation;
     devices = location.devices;
+    
+    int device_on = 0, device_off = 0, device_total = 0;
 
-    var widget;
+    var page;
+    var header;
+    var body;
 
     if(isSearching){
       presenter.loadLocationByUID(location.uid);
-      widget = new Center(
+      body = new Center(
         child: new Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           child: new CircularProgressIndicator()
         )
       );      
     } else if(devices.isNotEmpty){
-      int length = devices.length;
-      print("number of devices: $length");
-      widget = new ListView.builder(
-        itemBuilder: (BuildContext context, int index){
-                        return new ListTile(
-                          leading: new Icon(Icons.lightbulb_outline),
-                          title: new Text(devices[index].name),
-                          trailing: new Switch(
-                            value: devices[index].status,
-                            onChanged: (value){
-                              presenter.changeState(location, devices[index]);
-                            },
-                          ),
-                        );
-                      }, 
-        itemCount: devices.length,
-      );
-    } else{
-      widget = new Center(
-        child: new Text("There is nothing to show"),
+
+    }
+
+    device_off = device_total - device_on;
+
+    page = new ListView(
+      children: buildDeviceList(devices.length)
+    );
+
+    return page;
+
+  }
+
+  Widget buildHeader(){
+    return new Card(
+      child: 
+      new Row(
+        children: <Widget>[
+          new Padding(
+            child: new Icon(
+              Icons.home,
+              size: 100.0,
+            ),
+            padding: EdgeInsets.all(25.0),
+          ),
+          new Column(
+            children: <Widget>[
+              new Text("text 1", ),
+              new Divider(
+                color: Colors.grey,
+              ),
+              new Text("text 2"),
+              new Divider(
+                color: Colors.grey,
+              ),
+              new Text("text 3"),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+
+  Widget buildFooter(){
+    return new Padding(
+      padding: new EdgeInsets.all(40.0),
+      child: new Text(
+        "To add new device,\nclick the add button on the right!", 
+        textAlign: TextAlign.center
+        ),
+    );
+  }
+
+  List<Widget> buildDeviceList(int length){
+    List<Widget> list = new List<Widget>();
+    list.add(buildHeader());
+    for(int index = 0; index<length; index++){
+      list.add(
+        new Card(
+          elevation: 1.5,
+          child: new Column(
+            children: <Widget>[
+              new ListTile(
+                leading: new Icon(Icons.lightbulb_outline),
+                title: new Text(devices[index].name),
+                trailing: new Switch(
+                  value: devices[index].status,
+                  onChanged: (value){
+                    presenter.changeState(location, devices[index]);
+                  },
+                ),
+                subtitle: new Text(devices[index].description),
+              ),
+            ],
+          ),
+        )
       );
     }
-    return widget;
+    list.add(buildFooter());
+    return list;
   }
 }

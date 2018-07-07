@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import './utils/container.dart';
 import './view/device_presenter.dart';
 import './data/model/location.dart';
-
+import './utils/toast.dart';
 
 class AddDevicePage extends StatefulWidget{
   static const String routeName = "/add-device";
@@ -16,6 +16,7 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
   Location location;
 
   final nameController = TextEditingController();
+  final descController = TextEditingController();
 
   AddDevicePresenter presenter;
 
@@ -33,6 +34,7 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
   void initState() {
       super.initState();
       nameController.text = "";
+      descController.text = "";
     }
 
   @override
@@ -47,7 +49,15 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
           new IconButton(
             icon: new Icon(Icons.done),
             onPressed: (){
-              Device newDevice = new Device(name: nameController.text);
+              if(nameController.text == ""){
+                Toaster.create("Name shouldn't be blank!");
+                return;
+              }
+              Device newDevice;
+              if(descController.text != '')
+                newDevice = new Device(name: nameController.text, description: descController.text);
+              else
+                newDevice = new Device(name: nameController.text);
               presenter.saveDeviceOnLocation(newDevice, location);
             },
           )
@@ -68,6 +78,17 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
                     hintText: 'Name'
                   ),
                 ),
+            ),
+            new ListTile(
+              leading: new Icon(Icons.description),
+              title: new TextField(
+                controller: descController,
+                autocorrect: false,
+                decoration: new InputDecoration(
+                    contentPadding: EdgeInsets.zero,
+                    hintText: 'Description'
+                  ),
+              ),
             )
           ],
         ),
