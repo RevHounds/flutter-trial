@@ -8,9 +8,8 @@ class Toaster{
     Fluttertoast.showToast(
       msg: msg,
       toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
+      gravity: ToastGravity.BOTTOM,
       timeInSecForIos: 1,
-      bgcolor: "#e74c3c",
       textcolor: '#ffffff'
     );
   }
