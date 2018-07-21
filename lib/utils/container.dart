@@ -35,6 +35,9 @@ class StateContainerState extends State<StateContainer>{
     );
   }
 
+  void deleteLocation(Location location){
+    locations.remove(location);
+  }
   
   Location findLocationByUID(String uid){
     for (var location in locations) {
@@ -42,7 +45,6 @@ class StateContainerState extends State<StateContainer>{
         onFocusLocation = location;
         return location;
       }
-        
     }
   }
   

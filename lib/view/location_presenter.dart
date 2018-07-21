@@ -17,6 +17,10 @@ abstract class LocationDetailContract{
   void onChangeState(Location location);
 }
 
+abstract class LocationDetailAppBarContract{
+  void onDeleteLocation(Location location);
+}
+
 class LocationListPresenter{
   LocationListContract _view;
   LocationRepository _repo;
@@ -81,5 +85,19 @@ class LocationDetailPresenter{
         .then((location){
           _view.onChangeState(location);
         });
+  }
+}
+
+class LocationAppBarPresenter{
+  LocationRepository _repo = Injector().locationRepository;
+  LocationDetailAppBarContract _view;
+
+  LocationAppBarPresenter(this._view);
+
+  void deleteLocation(String uid){
+    _repo.deleteLocation(uid)
+      .then((location){
+        _view.onDeleteLocation(location);
+      });
   }
 }

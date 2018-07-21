@@ -16,13 +16,22 @@ class LocationDetail extends StatefulWidget{
   LocationDetailState createState() => new LocationDetailState(locationUID);
 }
 
-class LocationDetailState extends State<LocationDetail>{
+class LocationDetailState extends State<LocationDetail> implements LocationDetailAppBarContract{
   Location location;
   var container;
   String locationUID;
-  
+  LocationAppBarPresenter presenter;  
+  bool closePage = false;
 
-  LocationDetailState(this.locationUID);
+  LocationDetailState(this.locationUID){
+    presenter = new LocationAppBarPresenter(this);
+  }
+
+  @override
+  void onDeleteLocation(Location location){
+    container.deleteLocation(location);
+    Navigator.of(context).pop();
+  }
 
   Future<Null> _neverSatisfied() async {
     String locationName = location.name;
@@ -49,6 +58,7 @@ class LocationDetailState extends State<LocationDetail>{
             new FlatButton(
               child: new Text("Delete"),
               onPressed: () {
+                presenter.deleteLocation(locationUID);
                 Navigator.of(context).pop();
               },
             ),
@@ -66,7 +76,7 @@ class LocationDetailState extends State<LocationDetail>{
   Widget build(BuildContext context){
     container = StateContainer.of(context);
     this.location = container.findLocationByUID(locationUID);
-    
+
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(location.name),

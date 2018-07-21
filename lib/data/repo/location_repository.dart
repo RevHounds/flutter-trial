@@ -22,6 +22,7 @@ abstract class LocationRepository{
   Future<List<Location>> save(Location location);
   Future<List<Location>> addDeviceOnLocation(Device device, Location location);
   Future<Location> changeDeviceStateOnLocation(String location_uid, String device_uid);
+  Future<Location> deleteLocation(String uid);
 }
 
 class MockLocationRepository implements LocationRepository{
@@ -30,6 +31,14 @@ class MockLocationRepository implements LocationRepository{
   MockLocationRepository(){
     print("Mock location initialized");
     locations = startingList;
+  }
+
+  Location findLocationByUID(String uid){
+    for(Location location in locations){
+      if(location.uid == uid)
+        return location;
+    }
+    return null;
   }
 
   @override
@@ -85,5 +94,10 @@ class MockLocationRepository implements LocationRepository{
       }
     }
     return Future.value(null);
+  }
+
+  @override
+  Future<Location> deleteLocation(String uid){
+    return Future.value(locations.removeAt(locations.indexOf(findLocationByUID(uid))));
   }
 }
