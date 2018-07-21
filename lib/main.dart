@@ -3,7 +3,13 @@ import 'utils/container.dart';
 import './app.dart';
 import 'utils/injector.dart';
 
+class Starter{
+  Stater(){
+    Injector.configure(Flavor.MOCK);
+    runApp(new StateContainer(new Myapp()));
+  }
+}
+
 void main() {
-  Injector.configure(Flavor.MOCK);
-  runApp(new StateContainer(new Myapp()));
-} 
+  new Starter();
+}

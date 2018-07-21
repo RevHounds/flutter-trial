@@ -37,6 +37,19 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
       descController.text = "";
     }
 
+  void addNewDevice(){
+    if(nameController.text == ""){
+      Toaster.create("Name shouldn't be blank!");
+      return;
+    }
+    Device newDevice;
+    if(descController.text != '')
+      newDevice = new Device(name: nameController.text, description: descController.text);
+    else
+      newDevice = new Device(name: nameController.text);
+    presenter.saveDeviceOnLocation(newDevice, location);
+  }
+
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
@@ -48,18 +61,7 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
         actions: <Widget>[
           new IconButton(
             icon: new Icon(Icons.done),
-            onPressed: (){
-              if(nameController.text == ""){
-                Toaster.create("Name shouldn't be blank!");
-                return;
-              }
-              Device newDevice;
-              if(descController.text != '')
-                newDevice = new Device(name: nameController.text, description: descController.text);
-              else
-                newDevice = new Device(name: nameController.text);
-              presenter.saveDeviceOnLocation(newDevice, location);
-            },
+            onPressed: addNewDevice,
           )
         ],
       ),

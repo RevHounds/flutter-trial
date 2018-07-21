@@ -3,6 +3,8 @@ import 'data/model/location.dart';
 import 'view/location_presenter.dart';
 import 'utils/container.dart';
 import './add_device_page.dart';
+import './widgets/loading_screen.dart';
+import 'dart:async';
 
 class LocationDetail extends StatefulWidget{
   static String routeName = '/location_detail';
@@ -18,8 +20,47 @@ class LocationDetailState extends State<LocationDetail>{
   Location location;
   var container;
   String locationUID;
+  
 
   LocationDetailState(this.locationUID);
+
+  Future<Null> _neverSatisfied() async {
+    String locationName = location.name;
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('Delete Location'),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text("Are you sure you wanted to delete $locationName?")
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Delete"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteLocation(){
+    _neverSatisfied();
+  }
 
   @override
   Widget build(BuildContext context){
@@ -29,6 +70,12 @@ class LocationDetailState extends State<LocationDetail>{
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(location.name),
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: deleteLocation,
+            )
+        ],
       ),
       body: new DeviceList(location.uid),
       floatingActionButton: new FloatingActionButton(
@@ -112,35 +159,45 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
     location = container.onFocusLocation;
     devices = location.devices;
     
-    int device_on = 0, device_off = 0, device_total = 0;
 
     var page;
-    var header;
     var body;
 
     if(isSearching){
       presenter.loadLocationByUID(location.uid);
-      body = new Center(
-        child: new Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-          child: new CircularProgressIndicator()
-        )
-      );      
-    } else if(devices.isNotEmpty){
-
+      body = new LoadingScreen();
+    } else{
+      body = buildDeviceList(devices.length);
     }
 
-    device_off = device_total - device_on;
+    var curators = new List<Widget>();
+
+    curators.add(buildHeader());
+    curators.addAll(buildDeviceList(devices.length).toList());
+    curators.add(buildFooter());
 
     page = new ListView(
-      children: buildDeviceList(devices.length)
+      children: curators
     );
-
     return page;
+  }
 
+  int getDeviceOn(){
+    int count = 0;
+    for(var device in devices){
+      if(device.status)
+        count++;
+    }
+    return count;
   }
 
   Widget buildHeader(){
+    int device_on = 0, device_off = 0, device_total = 0;
+    
+    device_on = getDeviceOn();
+    device_total = devices.length;
+    device_off = device_total - device_on;
+
     return new Card(
       child: 
       new Row(
@@ -153,16 +210,29 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
             padding: EdgeInsets.all(25.0),
           ),
           new Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new Text("text 1", ),
-              new Divider(
-                color: Colors.grey,
+              new Text(
+                "Active Device: $device_on", 
+                textScaleFactor: 1.3,
+                textAlign: TextAlign.left,
               ),
-              new Text("text 2"),
               new Divider(
-                color: Colors.grey,
+                color: Colors.black,
               ),
-              new Text("text 3"),
+              new Text(
+                "Inactive Device: $device_off", 
+                textScaleFactor: 1.3,
+                textAlign: TextAlign.left,
+              ),
+              new Divider(
+                color: Colors.black,
+              ),
+              new Text(
+                "Total Device: $device_total",                 
+                textScaleFactor: 1.3,
+                textAlign: TextAlign.left,
+              ),
             ],
           )
         ],
@@ -183,7 +253,6 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
 
   List<Widget> buildDeviceList(int length){
     List<Widget> list = new List<Widget>();
-    list.add(buildHeader());
     for(int index = 0; index<length; index++){
       list.add(
         new Card(
@@ -206,7 +275,6 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
         )
       );
     }
-    list.add(buildFooter());
     return list;
   }
 }

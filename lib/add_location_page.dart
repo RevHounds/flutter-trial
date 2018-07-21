@@ -3,6 +3,7 @@ import 'data/model/location.dart';
 import './utils/container.dart';
 import './view/location_presenter.dart';
 
+
 final nameController = TextEditingController();
 final addressController = TextEditingController();
 
