@@ -1,21 +1,29 @@
 name: final_of_something
 description: A new Flutter project.
 
+environment:
+  sdk: '>=2.0.0-dev.1.0 <3.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
   uuid: "^1.0.0"
   fluttertoast: ^2.0.4
+  http: ^0.11.3+16
+  path_provider: '>=0.3.0'
+  sqflite: any
+  firebase: ^5.0.1
+  onesignal: ^1.0.1
+  jaguar: ^2.2.24
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
+  cupertino_icons: ^0.1.2 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-
+    
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 

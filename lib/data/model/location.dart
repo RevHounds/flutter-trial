@@ -14,6 +14,10 @@ class Location{
       devices.add(new Device(name: "Lampu Depan"));
     }
 
+  Location.fromMap(Map<String, dynamic> map){
+    
+  }
+
   static Location fromView(LocationAddView view)  {
     print("Try make location");
     return new Location(view.ip, view.name, view.picture);
