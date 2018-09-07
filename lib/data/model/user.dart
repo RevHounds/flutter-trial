@@ -1,12 +1,12 @@
-class UserModel{
+class User{
   String uid;
   String name;
   String password;
   String email;
 
-  UserModel(this.uid, this.name, this.email, this.password);
+  User(this.uid, this.name, this.email, this.password);
 
-  UserModel.fromMap(Map<String, dynamic> map){
+  User.fromMap(Map<String, dynamic> map){
     this.uid = map["id"];
     this.name = map["name"];
     this.email = map["email"];

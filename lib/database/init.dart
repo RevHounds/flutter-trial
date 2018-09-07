@@ -30,10 +30,15 @@ class MainDB{
           email TEXT
         );
 
-        CREATE DATABASE PiBoards(
+        CREATE DATABASE Location(
           id TEXT PRIMARY KEY,
           FOREIGN KEY(ownerId) REFERENCES User(id),
-          name TEXT,
+          name TEXT
+        );
+
+        CREATE DATABASE PiBoards(
+          id TEXT PRIMARY KEY,
+          FOREIGN KEY(locationId) REFERENCES Location(id),
           address TEXT
         );
 
