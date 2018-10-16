@@ -1,7 +1,6 @@
 import '../model/location.dart';
 import 'dart:async';
 
-
 List <Location> startingList = 
  <Location> [
    new Location(

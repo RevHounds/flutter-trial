@@ -4,13 +4,20 @@ import 'data/model/location.dart';
 import 'utils/container.dart';
 import './add_location_page.dart';
 import 'location_detail.dart';
+import 'login.dart';
 
 class Myapp extends StatelessWidget{
+  var container;
+  var homePage;
+
   @override
   Widget build(BuildContext context){
+    container = StateContainer.of(context);
+    homePage = new LoginPage();
+
     return new MaterialApp(
-      title: "Final App From Studying",
-      home: new MainMenu()
+      title: "Smart Home",
+      home: homePage
     );
   }
 }
@@ -25,7 +32,8 @@ class MainMenu extends StatelessWidget{
       body: new LocationList(),
       floatingActionButton: new FloatingActionButton(
         child: new Icon(Icons.add),
-        onPressed: (){_gotoAddLocationPage(context);},
+        onPressed: (){_gotoAddLocationPage(context);
+        },
       ),
     );
   }
@@ -60,7 +68,6 @@ class LocationListState extends State<LocationList> implements LocationListContr
     presenter = new LocationListPresenter(this);
 
     print("Presenter initialized");
-
   }
 
   @override

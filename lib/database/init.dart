@@ -16,11 +16,11 @@ class MainDB{
   initDatabase() async{
     io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentDirectory.path, "macharoon.db");
-    var database = await openDatabase(path, version: 1, onCreate: _onDatabaseCreate);
+    var database = await openDatabase(path, version: 1, onCreate: _onCreate);
     return database;
   }
 
-  void _onDatabaseCreate(Database db, int version) async {
+  void _onCreate(Database db, int version) async {
     await db.execute(
       '''
         CREATE DATABASE User(
@@ -42,7 +42,7 @@ class MainDB{
           address TEXT
         );
 
-        CREATE DATABASE Equipment(
+        CREATE DATABASE Device(
           id TEXT PRIMARY KEY,
           FOREIGN KEY(piId) REFERENCES PiBoards(id),
           name TEXT
@@ -50,7 +50,7 @@ class MainDB{
 
         CREATE DATABASE Schedule(
           id TEXT PRIMARAY KEY,
-          FOREIGN KEY(equipmentId) REFERENCES Equipment(id),
+          FOREIGN KEY(equipmentId) REFERENCES Device(id),
           startTime TEXT,
           endTime TEXT,
           day TEXT
@@ -59,4 +59,6 @@ class MainDB{
     );
     print("Database Created");
   }
+
+  
 }

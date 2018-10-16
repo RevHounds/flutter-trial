@@ -6,30 +6,13 @@ import '../data/model/user.dart';
 class UserDatabaseHelpoer{
   Database _database;
   MainDB db;
+  
   UserDatabaseHelpoer(){
     db = new MainDB();
     db.getDatabase()
       .then((database){
         _database = database;
       });
-  }
-
-  Future<User> getUser(String email, String password) async{
-    var dbClient = _database;
-    
-    List<Map> res = await dbClient.rawQuery(
-      '''
-        SELECT *
-        FROM User
-        WHERE User.email = $email AND User.password = $password
-      '''
-    );
-    if(res == null)
-      return Future.value(null);
-    
-    Map user = res.first;
-    User foundUser = new User.fromMap(user);
-    return Future.value(foundUser);
   }
 
   void saveUser(User newUser){
@@ -67,15 +50,9 @@ class UserDatabaseHelpoer{
     );
   }
 
-  void deleteUser(String uid){
+  Future<bool> isLoggedIn() async{
     var dbClient = _database;
-
-    dbClient.rawQuery(
-      ''' 
-      DELETE User
-      WHERE
-        id = $uid
-      '''
-    );
+    var res = await dbClient.query("User");
+    return res.length > 0;
   }
 }

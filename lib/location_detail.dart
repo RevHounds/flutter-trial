@@ -169,6 +169,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
     location = container.onFocusLocation;
     devices = location.devices;
     
+    getDevicesStatus();
 
     var page;
     var body;
@@ -190,6 +191,12 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
       children: curators
     );
     return page;
+  }
+
+  void getDevicesStatus() async{
+    for(var device in devices){
+       
+    }
   }
 
   int getDeviceOn(){

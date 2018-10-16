@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../data/model/location.dart';
-
+import '../data/model/user.dart';
 
 class StateContainer extends StatefulWidget{
   Location onFocusLocation;
   List<Location> locations;
   Widget child;
+  User activeUser;
+  bool errorLogin = false;
+  bool loggedIn = false;
   
   StateContainer(this.child) : locations = new List();
 
@@ -21,6 +24,9 @@ class StateContainer extends StatefulWidget{
 class StateContainerState extends State<StateContainer>{
   List<Location> locations;
   Location onFocusLocation;
+  User activeUser;
+  bool errorLogin = false;
+  bool loggedIn = false;
   int count;
 
   @override
@@ -54,8 +60,6 @@ class InheritedStateContainer extends InheritedWidget{
   final StateContainerState data;
 
   InheritedStateContainer(this.data, Widget child) : super(child: child){
-    int n = data.count;
-    print("Shit called, and not null, count: $n");
   }
 
   @override

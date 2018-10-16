@@ -1,5 +1,5 @@
 import '../data/repo/location_repository.dart';
-
+import '../data/repo/app_repository.dart';
 enum Flavor{
   MOCK,
   PRO
@@ -9,6 +9,7 @@ class Injector{
   static final Injector _singleton = new Injector._internal();
   static Flavor _flavor;
   static MockLocationRepository mockLocationRepository = new MockLocationRepository();
+  static MockApplicationRepository mockApplicationRepository = new MockApplicationRepository();
 
   static void configure(Flavor flavor) {
     _flavor = flavor; 
@@ -19,6 +20,10 @@ class Injector{
   }
 
   Injector._internal();
+
+  ApplicationRepository get applicationRepository{
+    return mockApplicationRepository;
+  }
 
   LocationRepository get locationRepository{
     switch(_flavor){
