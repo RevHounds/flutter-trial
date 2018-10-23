@@ -36,7 +36,7 @@ class RegisterPageState extends State<RegisterPage> implements RegisterContract{
 
   @override
   void onRegisterSucceed(User user){
-    container.activeUser = user;
+    container.user = user;
 
     Navigator.of(context).pushReplacement(
       new MaterialPageRoute(

@@ -6,7 +6,7 @@ class StateContainer extends StatefulWidget{
   Location onFocusLocation;
   List<Location> locations;
   Widget child;
-  User activeUser;
+  User user;
   bool errorLogin = false;
   bool loggedIn = false;
   
@@ -24,16 +24,13 @@ class StateContainer extends StatefulWidget{
 class StateContainerState extends State<StateContainer>{
   List<Location> locations;
   Location onFocusLocation;
-  User activeUser;
+  User user;
   bool errorLogin = false;
   bool loggedIn = false;
-  int count;
 
   @override
   Widget build(BuildContext context) {
     print("Inherited Widget is initialized");
-
-    count = 1;
 
     return new InheritedStateContainer(
       this,         //data passed down

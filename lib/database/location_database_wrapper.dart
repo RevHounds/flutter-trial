@@ -4,10 +4,10 @@ import 'init.dart';
 import '../data/model/location.dart';
 import '../data/model/user.dart';
 
-class LocationDatabaseHelpoer{
+class LocationDatabaseHelper{
   Database _database;
   MainDB db;
-  LocationDatabaseHelpoer(){
+  LocationDatabaseHelper(){
     db = new MainDB();
     db.getDatabase()
       .then((database){
@@ -15,14 +15,13 @@ class LocationDatabaseHelpoer{
       });
   }
 
-  Future<List<Location>> getLocationsByUserId(String userId) async{
+  Future<List<Location>> getLocations() async{
     var dbClient = _database;
     
     List<Map> res = await dbClient.rawQuery(
       '''
         SELECT *
         FROM Location
-        WHERE ownerId = $userId
       '''
     );
     List<Location> locations;
@@ -32,26 +31,27 @@ class LocationDatabaseHelpoer{
     return Future.value(locations);  
   }
 
-  void saveLocation(Location newLocation, User user){
+  Future<Location> saveLocation(Location newLocation) async {
     var dbClient = _database;
     String uid = newLocation.uid;
     String name = newLocation.name;
-    String ownerId = user.uid;
 
-    dbClient.rawInsert(
+    await dbClient.rawInsert(
       '''
-        INSERT INTO Location (id, ownerId, name)
-        VALUES($uid, $ownerId, $name)
+        INSERT INTO Location (id, name)
+        VALUES($uid, $name)
       '''
     );
+
+    return Future.value(newLocation);
   }
 
-  void updateLocation(Location newLocation, User user){
+  Future<Location> updateLocation(Location newLocation, User user) async {
     var dbClient = _database;
     String uid = newLocation.uid;
     String name = newLocation.name;
 
-    dbClient.rawQuery(
+    await dbClient.rawQuery(
       '''
         UPDATE Location
         SET
@@ -60,6 +60,8 @@ class LocationDatabaseHelpoer{
           id = $uid
       '''
     );
+
+    return Future.value(newLocation);
   }
 
   void deleteLocation(String uid){

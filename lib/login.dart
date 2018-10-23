@@ -62,7 +62,7 @@ class LoginPageState extends State<LoginPage> implements LoginContract{
     container.errorLogin = false;
     container.loggedIn = true;
 
-    container.activeUser = user;
+    container.user = user;
   
     Navigator.of(context).pushReplacement(
       new MaterialPageRoute(

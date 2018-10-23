@@ -1,5 +1,7 @@
 import '../model/location.dart';
 import 'dart:async';
+import '../../database/location_database_wrapper.dart';
+import '../../utils/rest-getway.dart';
 
 List <Location> startingList = 
  <Location> [
@@ -17,11 +19,59 @@ List <Location> startingList =
 
 abstract class LocationRepository{
   Future<Location> getLocationByUID(String uid);
-  Future<List<Location>> fetch();
+  Future<List<Location>> fetch(String userID);
   Future<List<Location>> save(Location location);
   Future<List<Location>> addDeviceOnLocation(Device device, Location location);
   Future<Location> changeDeviceStateOnLocation(String location_uid, String device_uid);
   Future<Location> deleteLocation(String uid);
+}
+
+class ProLocationRepositroy implements LocationRepository{
+  LocationDatabaseHelper _db = new LocationDatabaseHelper();
+  RestGetway getway = new RestGetway();
+  List<Location> locations;
+
+  ProLocationRepository(){
+    _db.getLocations().then(
+      (locations){
+        this.locations = locations;
+      }
+    );
+  }
+
+  Future<Location> getLocationByUID(String uid){
+     for(Location location in locations){
+      if(location.uid == uid)
+        return Future.value(location);
+    }
+    return null;
+  }
+
+  Future<List<Location>> fetch(String userID) async {
+    return getway.getLocations(userID).then(
+      (result){
+        this.locations = result;
+        return Future.value(result);
+      }
+    );
+  }
+
+  Future<List<Location>> save(Location location){
+    return getway.addLocation(location).then(
+      (res){
+        return _db.saveLocation(location).then(
+          (location){
+            locations.add(location);
+            return locations;
+          }
+        );
+      }
+    );
+  }
+
+  Future<List<Location>> addDeviceOnLocation(Device device, Location location){}
+  Future<Location> changeDeviceStateOnLocation(String location_uid, String device_uid){}
+  Future<Location> deleteLocation(String uid){}
 }
 
 class MockLocationRepository implements LocationRepository{
@@ -50,7 +100,7 @@ class MockLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<List<Location>> fetch(){
+  Future<List<Location>> fetch(String userID){
     return new Future.value(locations);
   }
 

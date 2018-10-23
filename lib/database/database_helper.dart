@@ -54,4 +54,11 @@ class DatabaseHelper {
     return res.length > 0? true: false;
   }
 
+  Future<User> getUser() async{
+    var dbClient = await db;
+    var res = await dbClient.query("User");
+    User user = User.fromMap(res[0]);
+    return Future.value(user);
+  }
+
 }

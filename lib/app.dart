@@ -66,8 +66,6 @@ class LocationListState extends State<LocationList> implements LocationListContr
   LocationListState(){
     isSearching = true;
     presenter = new LocationListPresenter(this);
-
-    print("Presenter initialized");
   }
 
   @override
@@ -89,6 +87,7 @@ class LocationListState extends State<LocationList> implements LocationListContr
   void initState() {
     super.initState();
     isSearching = true;
+    presenter.loadLocations(container.user.uid);
   }
 
 
@@ -103,8 +102,6 @@ class LocationListState extends State<LocationList> implements LocationListContr
 
     if(isSearching){
       print("Went in");
-      presenter.loadLocations();
-
 
       widget = new Center(
         child: new Padding(

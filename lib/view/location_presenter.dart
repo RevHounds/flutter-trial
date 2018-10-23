@@ -29,10 +29,10 @@ class LocationListPresenter{
     this._repo = Injector().locationRepository;
   }
 
-  void loadLocations(){
+  void loadLocations(String userID){
     assert(_view != null);
 
-    _repo.fetch()
+    _repo.fetch(userID)
         .then((locations){
             int n = locations.length;
             print("Location fetched, count: $n");

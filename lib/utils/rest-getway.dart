@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import '../data/model/location.dart';
 import 'netowrk.dart';
 import '../data/model/user.dart';
 import 'toast.dart';
@@ -11,9 +11,11 @@ class RestGetway{
 
   NetworkUtils _networkUtils = new NetworkUtils();
 
-  static final baseUrl = 'http://macharoon-junly.herokuapp.com';
+  static final baseUrl = 'https://macharoon-junly.herokuapp.com';
   static final loginUrl = baseUrl + "/login";
   static final registerUrl = baseUrl + "/register";
+  static final addLocationUrl = baseUrl + "/";
+  static final getLocationUrl = baseUrl + "/get-locations";
 
   static String _authentication_key = "";
 
@@ -67,6 +69,33 @@ class RestGetway{
         }
 
         Toaster.create("Failed to create new User");
+      }
+    );
+  }
+
+  Future<Location> addLocation(Location location){
+    print("Adding new location to user's account");
+
+    return NetworkUtils().post(addLocationUrl, body: {
+      "location_name" : location.name,
+      "location_image" : location.picture
+    }).then(
+      (location){
+        return Future.value(location);
+      }
+    );
+  }
+
+  Future<List<Location>> getLocations(String userID){
+    print("fetching locations");
+
+    return NetworkUtils().post( getLocationUrl,
+      body: {
+        "user_id" : userID
+      }
+    ).then(
+      (locations){
+        return Future.value(locations);
       }
     );
   }
