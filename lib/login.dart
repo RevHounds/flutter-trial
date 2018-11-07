@@ -29,14 +29,17 @@ class LoginPageState extends State<LoginPage> implements LoginContract{
 
   Future<bool> isLoggedIn() async{
     SharedPreferences pref = await SharedPreferences.getInstance();
-    var state = pref.getBool("isLoggedIn");
-    pref.setBool("isLoggedIn", false);
+    var state = await pref.getBool("isLoggedIn");
     return state == null ? false : state;
   }
 
   LoginPageState() {
-    isLoggedIn().then((isLoggedIn){
+    isLoggedIn().then((isLoggedIn) async {
       if(isLoggedIn){
+        print("udah, tinggal masuk aja om");
+        getway.initOnPrevData().then((user){
+          container.user = user;
+        });
         Navigator.of(context).pushReplacement(
           new MaterialPageRoute(
             builder: (context){
@@ -58,10 +61,12 @@ class LoginPageState extends State<LoginPage> implements LoginContract{
   void onLoginSucceed(User user) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.setBool("isLoggedIn", true);
-
+    await pref.setString("uid", user.uid);
+    
     container.errorLogin = false;
     container.loggedIn = true;
 
+    print("Known user id: " + user.uid);
     container.user = user;
   
     Navigator.of(context).pushReplacement(

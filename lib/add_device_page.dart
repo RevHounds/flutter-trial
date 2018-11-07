@@ -17,6 +17,7 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
 
   final nameController = TextEditingController();
   final descController = TextEditingController();
+  final portController = TextEditingController();
 
   AddDevicePresenter presenter;
 
@@ -35,6 +36,7 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
       super.initState();
       nameController.text = "";
       descController.text = "";
+      portController.text = "";
     }
 
   void addNewDevice(){
@@ -42,11 +44,17 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
       Toaster.create("Name shouldn't be blank!");
       return;
     }
+
+    if(portController.text == ""){
+      Toaster.create("Port shouldn't be blank!");
+      return;
+    }
+
     Device newDevice;
     if(descController.text != '')
-      newDevice = new Device(name: nameController.text, description: descController.text);
+      newDevice = new Device(name: nameController.text, description: descController.text, port: int.parse(portController.text));
     else
-      newDevice = new Device(name: nameController.text);
+      newDevice = new Device(name: nameController.text, port: int.parse(portController.text));
     presenter.saveDeviceOnLocation(newDevice, location);
   }
 
@@ -89,6 +97,16 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
                 decoration: new InputDecoration(
                     contentPadding: EdgeInsets.zero,
                     hintText: 'Description'
+                  ),
+              ),
+            ),new ListTile(
+              leading: new Icon(Icons.lightbulb_outline),
+              title: new TextField(
+                controller: portController,
+                autocorrect: false,
+                decoration: new InputDecoration(
+                    contentPadding: EdgeInsets.zero,
+                    hintText: 'Port Number'
                   ),
               ),
             )

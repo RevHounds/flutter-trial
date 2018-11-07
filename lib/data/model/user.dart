@@ -6,6 +6,8 @@ class User{
   String image;
 
   User(this.name, this.email, this.password, this.image);
+  
+  User.fromApp(this.uid, this.email, this.password);
 
   User.fromMap(Map<String, dynamic> map){
     this.uid = map["Id"];

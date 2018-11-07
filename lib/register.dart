@@ -6,6 +6,7 @@ import 'view/app_presenter.dart';
 import 'data/model/user.dart';
 import 'app.dart';
 import 'utils/toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget{
   @override
@@ -13,7 +14,6 @@ class RegisterPage extends StatefulWidget{
 }
 
 class RegisterPageState extends State<RegisterPage> implements RegisterContract{
-
   RestGetway getway;
   RegisterPresenter presenter;
 
@@ -35,7 +35,8 @@ class RegisterPageState extends State<RegisterPage> implements RegisterContract{
   }
 
   @override
-  void onRegisterSucceed(User user){
+  void onRegisterSucceed(User user) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
     container.user = user;
 
     Navigator.of(context).pushReplacement(

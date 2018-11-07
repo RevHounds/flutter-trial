@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'data/model/location.dart';
 import './utils/container.dart';
 import './view/location_presenter.dart';
-
+import './utils/toast.dart';
 
 final nameController = TextEditingController();
 final addressController = TextEditingController();
@@ -62,6 +62,16 @@ class AddLocationContainerState extends State<AddLocationContainer> implements A
   void _saveLocation(){
     String name = nameController.text;
     String address = addressController.text;
+
+    if(nameController.text == ""){
+      Toaster.create("Name shouldn't be blank");
+      return;
+    }
+
+    if(addressController.text == ""){
+      Toaster.create("Address shouldn't be blank");
+      return;
+    }
     
     LocationAddView newLocationView = new LocationAddView(name, address);
     
@@ -97,7 +107,7 @@ class AddLocationForm extends StatelessWidget{
                   keyboardType: TextInputType.text,
                   decoration: new InputDecoration(
                     contentPadding: EdgeInsets.zero,
-                    hintText: 'Address'
+                    hintText: 'IP address'
                   ),
                 )
             )

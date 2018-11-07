@@ -23,11 +23,15 @@ class NetworkUtils{
     });
   }
 
-  Future<dynamic> post(String url, {headers, Map body, encoding}) async {
+  Future<dynamic> post(String url, {Map headers, Map body, encoding}) async {
     HttpClient client = new HttpClient();
     HttpClientRequest request = await client.postUrl(Uri.parse(url));
     request.headers.set('content-type', 'application/json');
+    if(headers != null){
+      request.headers.set('authorization', headers['authorization']);
+    }
     request.add(utf8.encode(json.encode(body)));
+
     HttpClientResponse response = await request.close();
     String res = await response.transform(utf8.decoder).join();
     return _decoder.convert(res);

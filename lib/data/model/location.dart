@@ -11,11 +11,14 @@ class Location{
 	Location(this.ip, this.name, this.picture) {
       uid = new IDGenerator().generateUID();
       devices = new List<Device>();
-      devices.add(new Device(name: "Lampu Depan"));
     }
 
   Location.fromMap(Map<String, dynamic> map){
-    
+    this.uid = map["Id"];
+    this.name = map["Name"];
+    this.picture = "http://www.for-example.org/img/main/forexamplelogo.png";
+    this.ip = map["Ip"];
+    this.devices = new List<Device>();
   }
 
   static Location fromView(LocationAddView view)  {
@@ -42,7 +45,7 @@ class LocationView extends Location{
 
 class LocationAddView extends LocationView{
   LocationAddView(String name, String address)
-    : super('127.0.0.1', name, "http://www.for-example.org/img/main/forexamplelogo.png");
+    : super(address, name, "http://www.for-example.org/img/main/forexamplelogo.png");
 }
 
 class Device{
@@ -51,10 +54,22 @@ class Device{
   bool status;
   String icon;
   String description;
+  int port;
+
   Device({
     this.name,
     this.icon = "lightbulb_outline",
     this.status = false,
-    this.description = "None"
-  }) : uid = new IDGenerator().generateUID();
+    this.description = "None",
+    this.port = 1
+  }) : this.uid = new IDGenerator().generateUID();
+
+  Device.fromMap(Map<String, dynamic> map){
+    this.uid = map["Id"];
+    this.name = map["Name"];
+    this.status = map["Status"];
+    this.icon = map["Icon"];
+    this.description = map["Description"];
+    this.port = map["Port"];
+  }
 }

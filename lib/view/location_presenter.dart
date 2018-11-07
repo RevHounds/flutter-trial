@@ -1,7 +1,7 @@
 import '../data/model/location.dart';
 import '../data/repo/location_repository.dart';
 import '../utils/injector.dart';
-
+import '../data/model/user.dart';
 
 abstract class LocationListContract{
   void onLoadLocationComplete(List<Location> locations);
@@ -29,11 +29,15 @@ class LocationListPresenter{
     this._repo = Injector().locationRepository;
   }
 
-  void loadLocations(String userID){
+  void loadLocations(User user){
     assert(_view != null);
 
-    _repo.fetch(userID)
+    _repo.fetch(user)
         .then((locations){
+            if(locations == null){
+              _view.onErrorLoadLocation();
+              return;
+            }
             int n = locations.length;
             print("Location fetched, count: $n");
             _view.onLoadLocationComplete(locations);
@@ -69,9 +73,11 @@ class LocationDetailPresenter{
     this._repo = Injector().locationRepository;
   }
 
-  void loadLocationByUID(String uid){
+  void loadLocationByUID(Location location){
+    String uid = location.uid;
     print("ini lagi cobain cari si $uid");
-    _repo.getLocationByUID(uid)
+
+    _repo.getLocationByUID(location)
       .then((location){
         print("location found!");
         _view.onLoadLocation(location);
@@ -79,9 +85,7 @@ class LocationDetailPresenter{
   }
 
   void changeState(Location location, Device device){
-    String location_uid = location.uid;
-    String device_uid = device.uid;
-    _repo.changeDeviceStateOnLocation(location_uid, device_uid)
+    _repo.changeDeviceStateOnLocation(device, location)
         .then((location){
           _view.onChangeState(location);
         });
@@ -96,7 +100,7 @@ class LocationAppBarPresenter{
 
   void deleteLocation(String uid){
     _repo.deleteLocation(uid)
-      .then((location){
+      .then((location){ 
         _view.onDeleteLocation(location);
       });
   }

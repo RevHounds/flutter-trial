@@ -7,6 +7,10 @@ abstract class LoginContract{
   void onLoginSucceed(User user);
 }
 
+abstract class LogoutContract{
+  void onLogout();
+}
+
 abstract class RegisterContract{
   void onRegisterSucceed(User user);
 }
@@ -35,8 +39,15 @@ class LoginPresenter{
   }
 
   loginSucceed(User user){
-    _repo.saveUser(user).then((user){
-      _view.onLoginSucceed(user);
-    });
+    _view.onLoginSucceed(user);
+  }
+}
+
+class MainMenuPresenter{
+  LogoutContract _view;
+  MainMenuPresenter(this._view);
+  
+  void logout(){
+    _view.onLogout();  
   }
 }

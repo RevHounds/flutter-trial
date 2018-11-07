@@ -5,6 +5,8 @@ import 'utils/container.dart';
 import './add_location_page.dart';
 import 'location_detail.dart';
 import 'login.dart';
+import './view/app_presenter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Myapp extends StatelessWidget{
   var container;
@@ -22,12 +24,89 @@ class Myapp extends StatelessWidget{
   }
 }
 
-class MainMenu extends StatelessWidget{
+class MainMenu extends StatefulWidget{
+  @override
+  State<MainMenu> createState() => new MainMenuState();
+}
+
+class MainMenuState extends State<MainMenu> implements LogoutContract{
+  MainMenuPresenter presenter;
+
+  void init() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool("isLoggedIn", true);
+  }    
+
+  @override
+  void onLogout(){
+    print("lagi logout");
+    Navigator.of(context).pushReplacement(
+      new MaterialPageRoute(
+        builder: (context){
+          print("sampe sini lho cok udahan");
+          return new LoginPage();
+        }
+      ));
+  }
+  
+  MainMenuState(){
+    presenter = new MainMenuPresenter(this);
+    init();
+  }
+
+  Future<Null> _neverSatisfied() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('Log Out'),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text("Are you sure you wanted to log out?")
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Log out"),
+              onPressed: () {
+                pref.setBool("isLoggedIn", false).then((state){
+                  print("logged off");
+                  presenter.logout();
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _logout(){
+    _neverSatisfied();
+  }
+
   @override
   Widget build(BuildContext context){
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Main Menu"),
+        actions: <Widget>[
+          new IconButton(
+            icon: Icon(Icons.power_settings_new),
+            onPressed: _logout,
+          )
+        ],
       ),
       body: new LocationList(),
       floatingActionButton: new FloatingActionButton(
@@ -80,14 +159,17 @@ class LocationListState extends State<LocationList> implements LocationListContr
 
   @override
   void onErrorLoadLocation(){
-    print("Error Load Location");
+    setState((){
+      container.locations = List<Location>();
+      isSearching = false;
+      print("no location found");
+    });
   }
 
   @override
   void initState() {
     super.initState();
     isSearching = true;
-    presenter.loadLocations(container.user.uid);
   }
 
 
@@ -101,6 +183,7 @@ class LocationListState extends State<LocationList> implements LocationListContr
     var widget;
 
     if(isSearching){
+      presenter.loadLocations(container.user);
       print("Went in");
 
       widget = new Center(

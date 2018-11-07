@@ -55,7 +55,7 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
                 Navigator.of(context).pop();
               },
             ),
-            new FlatButton(
+            new FlatButton( 
               child: new Text("Delete"),
               onPressed: () {
                 presenter.deleteLocation(locationUID);
@@ -169,13 +169,11 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
     location = container.onFocusLocation;
     devices = location.devices;
     
-    getDevicesStatus();
-
     var page;
     var body;
 
     if(isSearching){
-      presenter.loadLocationByUID(location.uid);
+      presenter.loadLocationByUID(location);
       body = new LoadingScreen();
     } else{
       body = buildDeviceList(devices.length);
@@ -191,12 +189,6 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
       children: curators
     );
     return page;
-  }
-
-  void getDevicesStatus() async{
-    for(var device in devices){
-       
-    }
   }
 
   int getDeviceOn(){

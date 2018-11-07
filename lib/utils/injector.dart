@@ -9,6 +9,7 @@ class Injector{
   static final Injector _singleton = new Injector._internal();
   static Flavor _flavor;
   static MockLocationRepository mockLocationRepository = new MockLocationRepository();
+  static ProLocationRepository proLocationRepository = new ProLocationRepository();
   static MockApplicationRepository mockApplicationRepository = new MockApplicationRepository();
 
   static void configure(Flavor flavor) {
@@ -27,7 +28,7 @@ class Injector{
 
   LocationRepository get locationRepository{
     switch(_flavor){
-      case Flavor.MOCK: return mockLocationRepository;
+      case Flavor.MOCK: return proLocationRepository;
       default: return mockLocationRepository;
     }
   }
