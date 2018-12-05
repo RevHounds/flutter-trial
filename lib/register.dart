@@ -36,7 +36,6 @@ class RegisterPageState extends State<RegisterPage> implements RegisterContract{
 
   @override
   void onRegisterSucceed(User user) async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
     container.user = user;
 
     Navigator.of(context).pushReplacement(
@@ -70,7 +69,7 @@ class RegisterPageState extends State<RegisterPage> implements RegisterContract{
       return;
     }
     
-    presenter.registerSuceed(User(name, email, password, "https://randomuser.me/api/portraits/thumb/men/68.jpg"));
+    presenter.registerSuceed(new User(name, email, password, "https://randomuser.me/api/portraits/thumb/men/68.jpg"));
   }
 
   @override

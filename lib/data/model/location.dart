@@ -1,3 +1,4 @@
+import 'device.dart';
 import '../../utils/uid.dart';
 
 class Location{
@@ -46,30 +47,4 @@ class LocationView extends Location{
 class LocationAddView extends LocationView{
   LocationAddView(String name, String address)
     : super(address, name, "http://www.for-example.org/img/main/forexamplelogo.png");
-}
-
-class Device{
-  String uid;
-  String name;
-  bool status;
-  String icon;
-  String description;
-  int port;
-
-  Device({
-    this.name,
-    this.icon = "lightbulb_outline",
-    this.status = false,
-    this.description = "None",
-    this.port = 1
-  }) : this.uid = new IDGenerator().generateUID();
-
-  Device.fromMap(Map<String, dynamic> map){
-    this.uid = map["Id"];
-    this.name = map["Name"];
-    this.status = map["Status"];
-    this.icon = map["Icon"];
-    this.description = map["Description"];
-    this.port = map["Port"];
-  }
 }

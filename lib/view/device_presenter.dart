@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import '../data/model/location.dart';
+import '../data/model/device.dart';
 import '../data/repo/location_repository.dart';
 import '../utils/injector.dart';
 

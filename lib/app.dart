@@ -1,12 +1,16 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'view/location_presenter.dart';
 import 'data/model/location.dart';
+import 'data/model/device.dart';
+import 'data/model/schedule.dart';
 import 'utils/container.dart';
 import './add_location_page.dart';
 import 'location_detail.dart';
 import 'login.dart';
+import 'device_detail.dart';
+import 'schedule_detail.dart';
 import './view/app_presenter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Myapp extends StatelessWidget{
   var container;

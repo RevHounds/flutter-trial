@@ -2,9 +2,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class Toaster{
 
-  static void create(
-    String msg,
-  ){
+  static void create(String msg){
     Fluttertoast.showToast(
       msg: msg,
       toastLength: Toast.LENGTH_SHORT,

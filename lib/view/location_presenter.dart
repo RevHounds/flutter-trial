@@ -1,7 +1,8 @@
-import '../data/model/location.dart';
 import '../data/repo/location_repository.dart';
 import '../utils/injector.dart';
 import '../data/model/user.dart';
+import '../data/model/location.dart';
+import '../data/model/device.dart';
 
 abstract class LocationListContract{
   void onLoadLocationComplete(List<Location> locations);

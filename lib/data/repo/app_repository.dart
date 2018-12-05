@@ -11,20 +11,17 @@ abstract class ApplicationRepository{
 }
 
 class MockApplicationRepository implements ApplicationRepository{
-  DatabaseHelper _db = new DatabaseHelper();
   RestGetway getway = new RestGetway();
 
   @override
   Future<User> registerUser(User user) async {
-    User registeredUser = await getway.register(user);
-
-    await _db.saveUser(registeredUser);
-    return Future.value(registeredUser);
+    return getway.register(user).then((registeredUser){
+      return Future.value(registeredUser);
+    });
   }
 
   @override
   Future<User> saveUser(User user) async {
-    await _db.saveUser(user);
     return Future.value(user);
   }
 

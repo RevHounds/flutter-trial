@@ -1,10 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'data/model/location.dart';
+import 'data/model/device.dart';
 import 'view/location_presenter.dart';
 import 'utils/container.dart';
 import './add_device_page.dart';
 import './widgets/loading_screen.dart';
-import 'dart:async';
+import 'device_detail.dart';
 
 class LocationDetail extends StatefulWidget{
   static String routeName = '/location_detail';
@@ -193,7 +195,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
 
   int getDeviceOn(){
     int count = 0;
-    for(var device in devices){
+    for(Device device in devices){
       if(device.status)
         count++;
     }
@@ -266,8 +268,18 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
       list.add(
         new Card(
           elevation: 1.5,
-          child: new Column(
-            children: <Widget>[
+          child: new FlatButton(
+            onPressed: (){
+              Navigator.of(context).push(
+                new MaterialPageRoute(
+                  builder: (context){
+                    print(devices[index].name);
+                    return new DeviceDetailPage(devices[index]);
+                  }
+                )
+              );
+            },
+            child:
               new ListTile(
                 leading: new Icon(Icons.lightbulb_outline),
                 title: new Text(devices[index].name),
@@ -279,7 +291,6 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
                 ),
                 subtitle: new Text(devices[index].description),
               ),
-            ],
           ),
         )
       );

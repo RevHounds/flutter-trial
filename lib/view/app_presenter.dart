@@ -24,8 +24,8 @@ class RegisterPresenter{
   }
 
   registerSuceed(User user){
-    _repo.registerUser(user).then((user){
-      _view.onRegisterSucceed(user);
+    _repo.registerUser(user).then((registeredUser){
+      _view.onRegisterSucceed(registeredUser);
     });
   }
 }

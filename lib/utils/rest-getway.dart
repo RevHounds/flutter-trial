@@ -1,7 +1,9 @@
-import 'dart:async';
 import '../data/model/location.dart';
-import 'netowrk.dart';
+import '../data/model/device.dart';
 import '../data/model/user.dart';
+import '../data/model/schedule.dart';
+import 'dart:async';
+import 'netowrk.dart';
 import 'toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,6 +25,10 @@ class RestGetway{
   static final addDeviceUrl = baseUrl + "/add-device";
   static final deleteDeviceUrl = baseUrl + "/delete-devices";
   static final updateDeviceUrl = baseUrl + "/update-device";
+  static final getScheduleUrl = baseUrl + "/get-schedules";
+  static final addScheduleUrl = baseUrl + "/add-schedule";
+  static final updateScheduleUrl = baseUrl + "/update-schedule";
+  static final deleteScheduleDeviceUrl = baseUrl + "/delete-device";
 
   String _authenticationKey = "";
   String _userId = "";
@@ -41,11 +47,14 @@ class RestGetway{
 
   Future<bool> getToken(User user) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
+    print(user.email);
     return _networkUtils.post(getTokenUrl, body: {
       'Email' : user.email,
       'Password' : user.password
     }          
     ).then((res){
+      print(user.email);
+      print(user.uid);
       this._authenticationKey = res["Token"];
       this._email = user.email;
       this._pass = user.password;
@@ -86,7 +95,6 @@ class RestGetway{
   }
 
   Future<User> register(User user) async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
     print("Adding new user request");
 
     return _networkUtils.post(registerUrl, body: {
@@ -98,7 +106,8 @@ class RestGetway{
     }
     ).then(
       (dynamic res){
-        if(res["error"] == false){
+        print("Done registering user");
+        if(res["error"] == "false"){
           User user = new User.fromMap(res["user"]);    
           Toaster.create("Succeeded");
       
@@ -108,14 +117,15 @@ class RestGetway{
             }
           );          
           return Future.value(user);
+        } else{
+          Toaster.create("Failed to create new User");
         }
-        Toaster.create("Failed to create new User");
       }
     );
   }
 
  Future<List<Location>> getLocations(User user) async {
-      var result = await getToken(user);
+      print(_userId);
       return NetworkUtils().post(getLocationUrl,
           body: {
             "id" : _userId
@@ -301,6 +311,114 @@ class RestGetway{
           print("bener masuk kok");
           device.status = !device.status;
           return Future.value(device);
+        }
+        return Future.value(null);
+      }
+    );
+  }
+
+  Future<List<Schedule>> getSchedules(Device device) async {
+      return NetworkUtils().post(getScheduleUrl,
+          body: {
+            "id" : device.uid
+          },
+          headers: {
+            "authorization" : "Bearer " + _authenticationKey
+          }
+        ).then(
+          (res){
+            List<Schedule> schedules = new List<Schedule>();
+            if(res == null){
+              print("There is no response body");
+              return Future.value(schedules);
+            }
+            
+            if(res["error"] == "true"){
+              print("There is no schedules found yet");
+              return Future.value(schedules);
+            }
+
+            res = res["Schedules"];
+            print(res.toString());
+            
+            for(Map<String, dynamic> schedule in res){
+              Schedule newSchedule = new Schedule.fromMap(schedule);
+              schedules.add(newSchedule);
+            }
+            return Future.value(schedules);
+          }
+        );
+  }
+
+  Future<Schedule> addSChedule(Schedule schedule, Device device){
+    print("Adding new schedule to a device");
+    print(_authenticationKey);
+    print("Schedule UID: " + schedule.uid);
+    print("Device UID: " + device.uid);
+  
+    return NetworkUtils().post(addScheduleUrl, body: {
+      "id" : schedule.uid,
+      "start" : schedule.start,
+      "command" : schedule.command,
+      "status" : schedule.status,
+      "days" : schedule.repeatString,
+      "deviceid" : device.uid
+    },  
+      headers: {
+        "authorization" : "Bearer " + _authenticationKey
+      }
+    ).then(
+      (res){
+        print(res.toString());
+        if(res["error"] == "false"){
+          
+          return Future.value(schedule);
+        }
+        return Future.value(null);
+      }
+    );
+  }
+
+  Future<String> deleteSchedule(String uid){
+    print(uid);
+    return NetworkUtils().post(deleteScheduleDeviceUrl, body: {
+        "id" : uid
+      },
+      headers: {
+        "authorization" : "Bearer " + _authenticationKey
+      }
+    ).then((res){
+      print(res.toString());
+      if(res["error"] == "false")
+        return Future.value(uid);
+      else
+        return Future.value("not found");
+    });
+  }
+
+  Future<Schedule> updateSchedule(Schedule schedule, Device device){
+    print("Updating Schedule in Device");
+    print(_authenticationKey);
+    print(schedule.repeatString);
+  
+    return NetworkUtils().post(updateScheduleUrl, body: {
+      "id" : schedule.uid,
+      "start" : schedule.start,
+      "command" : schedule.command,
+      "status" : schedule.status,
+      "days" : schedule.repeatString,
+      "deviceid" : device.uid
+    },  
+      headers: {
+        "authorization" : "Bearer " + _authenticationKey
+      }
+    ).then(
+      (res){
+        print(res.toString());
+        if(res["error"] == "false"){
+          print("schedule updated");
+          schedule.status = schedule.status;
+          return Future.value(schedule);
         }
         return Future.value(null);
       }

@@ -29,7 +29,7 @@ class LoginPageState extends State<LoginPage> implements LoginContract{
 
   Future<bool> isLoggedIn() async{
     SharedPreferences pref = await SharedPreferences.getInstance();
-    var state = await pref.getBool("isLoggedIn");
+    var state = pref.getBool("isLoggedIn");
     return state == null ? false : state;
   }
 

@@ -1,8 +1,9 @@
 import '../model/location.dart';
 import 'dart:async';
-import '../../database/location_database_wrapper.dart';
+import '../model/device.dart';
 import '../../utils/rest-getway.dart';
 import '../model/user.dart';
+import '../model/schedule.dart';
 
 List <Location> startingList = 
  <Location> [
@@ -26,6 +27,10 @@ abstract class LocationRepository{
   Future<List<Location>> addDeviceOnLocation(Device device, Location location);
   Future<Location> changeDeviceStateOnLocation(Device device, Location location);
   Future<Location> deleteLocation(String uid);
+  Future<List<Schedule>> getSchedules(Device device);
+  Future<Schedule> addScheduleOnDevice(Schedule schedule, Device device);
+  Future<Schedule> updateScheduleOnDevice(Schedule schedule, Device device);
+  void deleteScheduleOnDevice(Schedule schedule, Device device);
 }
 
 class ProLocationRepository implements LocationRepository{
@@ -95,16 +100,17 @@ class ProLocationRepository implements LocationRepository{
   @override
   Future<Location> changeDeviceStateOnLocation(Device device, Location location){
     return getway.updateDevice(device, location).then(
-        (device){
-          for(int i = 0; i<location.devices.length; i++){
-            if(location.devices[i].uid == device.uid){
-              location.devices[i] = (device);
-              return Future.value(location);
-            }
+      (device){
+        for(int i = 0; i<location.devices.length; i++){
+          if(location.devices[i].uid == device.uid){
+            location.devices[i] = (device);
+            return Future.value(location);
           }
         }
-      );
+      }
+    );
   }
+
   @override
   Future<Location> deleteLocation(String uid){
     print(uid);
@@ -116,10 +122,75 @@ class ProLocationRepository implements LocationRepository{
         return Future.value(locations.removeAt(locations.indexOf(findLocationByUID(uid))));
     });
   }
+
+  @override
+  Future<List<Schedule>> getSchedules(Device device){
+    return getway.getSchedules(device).then(
+      (schedules){
+        return Future.value(schedules);
+      }
+    );
+  }
+
+  @override
+  Future<Schedule> addScheduleOnDevice(Schedule schedule, Device device){
+    return getway.addSChedule(schedule, device).then(
+      (newSchedule){
+        return Future.value(newSchedule);
+      }
+    );
+  }
+
+  @override
+  Future<Schedule> updateScheduleOnDevice(Schedule schedule, Device device){
+    return getway.updateSchedule(schedule, device).then(
+      (newSchedule){
+        return Future.value(newSchedule);
+      }
+    );
+  }
+
+  @override
+  void deleteScheduleOnDevice(Schedule schedule, Device device){
+    getway.deleteSchedule(schedule.uid);
+  }
 }
 
 class MockLocationRepository implements LocationRepository{
   List<Location> locations;
+  RestGetway getway;
+
+  @override
+  Future<List<Schedule>> getSchedules(Device device){
+    return getway.getSchedules(device).then(
+      (schedules){
+        return Future.value(schedules);
+      }
+    );
+  }
+
+  @override
+  Future<Schedule> addScheduleOnDevice(Schedule schedule, Device device){
+    return getway.addSChedule(schedule, device).then(
+      (newSchedule){
+        return Future.value(newSchedule);
+      }
+    );
+  }
+
+  @override
+  Future<Schedule> updateScheduleOnDevice(Schedule schedule, Device device){
+    return getway.updateSchedule(schedule, device).then(
+      (newSchedule){
+        return Future.value(newSchedule);
+      }
+    );
+  }
+
+  @override
+  void deleteScheduleOnDevice(Schedule schedule, Device device){
+    getway.deleteSchedule(schedule.uid);
+  }
 
   MockLocationRepository(){
     print("Mock location initialized");

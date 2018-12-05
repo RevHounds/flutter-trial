@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import './utils/container.dart';
 import './view/device_presenter.dart';
 import './data/model/location.dart';
+import './data/model/device.dart';
 import './utils/toast.dart';
 
 class AddDevicePage extends StatefulWidget{
