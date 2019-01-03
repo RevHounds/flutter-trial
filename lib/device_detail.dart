@@ -7,7 +7,7 @@ import 'schedule_detail.dart';
 
 class DeviceDetailPage extends StatefulWidget{
   static const String routeName = "/device-detail";
-  Device device;
+  Device device; 
 
   DeviceDetailPage(this.device){
     print("loaded device detail page, loading " + device.name);

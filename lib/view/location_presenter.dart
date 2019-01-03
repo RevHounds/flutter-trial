@@ -22,6 +22,11 @@ abstract class LocationDetailAppBarContract{
   void onDeleteLocation(Location location);
 }
 
+abstract class LocationPairingStatusContract{
+  void onPairingFinished(Location location);
+  void onPairingNotFinished(Location location);
+}
+
 class LocationListPresenter{
   LocationListContract _view;
   LocationRepository _repo;
@@ -103,6 +108,24 @@ class LocationAppBarPresenter{
     _repo.deleteLocation(uid)
       .then((location){ 
         _view.onDeleteLocation(location);
+      });
+  }
+}
+
+class LocationPairingPresenter{
+  LocationRepository _repo = Injector().locationRepository;
+  LocationPairingStatusContract _view;
+
+  LocationPairingPresenter(this._view);
+
+  void checkStatus(Location location){
+    _repo.getLocationPairingStatus(location).then(
+      (status){
+        if(status == "owned"){
+          _view.onPairingFinished(location);
+        } else{
+          _view.onPairingNotFinished(location);
+        }
       });
   }
 }

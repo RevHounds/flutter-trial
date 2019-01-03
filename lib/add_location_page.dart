@@ -3,9 +3,10 @@ import 'data/model/location.dart';
 import './utils/container.dart';
 import './view/location_presenter.dart';
 import './utils/toast.dart';
+import './pairing_status.dart';
 
 final nameController = TextEditingController();
-final addressController = TextEditingController();
+final locationIdController = TextEditingController();
 
 class AddLocationPage extends StatelessWidget{
   static const String routeName = '/add-location';
@@ -25,12 +26,13 @@ class AddLocationContainer extends StatefulWidget{
 class AddLocationContainerState extends State<AddLocationContainer> implements AddLocationContract{
   var container;
   AddLocationPresenter presenter;
+  String classLocationId;
 
   @override
   void initState(){
     super.initState();
     nameController.text = "";
-    addressController.text = "";
+    locationIdController.text = "";
 
     presenter = new AddLocationPresenter(this);
   } 
@@ -38,7 +40,23 @@ class AddLocationContainerState extends State<AddLocationContainer> implements A
   @override
   void onSaveLocation(List<Location> locations) {
     container.locations = locations;
-    Navigator.pop(context);
+    print("we have come this far");
+    Location loc;
+    if (locations.length > 0){
+      loc = locations[locations.length - 1];
+      print("location len: " + locations.length.toString());
+    } else{
+      loc = new Location(classLocationId, "ngyah", "pict");
+      print("I choose another path altogether");
+    }
+
+    Navigator.of(context).pushReplacement(
+      new MaterialPageRoute(
+        builder: (context){
+          return new PairingStatusPage(loc);
+        }
+      )
+    );
   }
 
   @override
@@ -51,9 +69,9 @@ class AddLocationContainerState extends State<AddLocationContainer> implements A
         actions: <Widget>[
           new IconButton(
             icon: new Icon(Icons.done),
-            onPressed: _saveLocation)
-        ],
-          
+            onPressed: _saveLocation
+          )
+        ],  
       ),
       body: new AddLocationForm(),
     );
@@ -61,19 +79,20 @@ class AddLocationContainerState extends State<AddLocationContainer> implements A
 
   void _saveLocation(){
     String name = nameController.text;
-    String address = addressController.text;
+    String locationId = locationIdController.text;
 
     if(nameController.text == ""){
       Toaster.create("Name shouldn't be blank");
       return;
     }
 
-    if(addressController.text == ""){
+    if(locationIdController.text == ""){
       Toaster.create("Address shouldn't be blank");
       return;
     }
     
-    LocationAddView newLocationView = new LocationAddView(name, address);
+    classLocationId = locationId;
+    LocationAddView newLocationView = new LocationAddView(locationId, name);
     
     presenter.saveLocation(newLocationView);
   }
@@ -102,12 +121,12 @@ class AddLocationForm extends StatelessWidget{
             new ListTile(
                 leading: new Icon(Icons.place),
                 title: new TextField(
-                  controller: addressController,
+                  controller: locationIdController,
                   autocorrect: false,
                   keyboardType: TextInputType.text,
                   decoration: new InputDecoration(
                     contentPadding: EdgeInsets.zero,
-                    hintText: 'IP address'
+                    hintText: 'Location ID'
                   ),
                 )
             )

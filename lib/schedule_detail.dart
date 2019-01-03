@@ -55,6 +55,7 @@ class ScheduleDetailPage extends StatefulWidget{
 
 class ScheduleDetailPageState extends State<ScheduleDetailPage> implements CheckBoxTileContract{
   var container;
+  String timeRep = "";
   CheckBoxTilePresenter presenter;
   Schedule schedule;
   Schedule tempSchedule;
@@ -85,7 +86,16 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Check
     );
     if(picked != null) setState(() {
       _value = picked.toString();
-      schedule.start = picked.hour.toString() + ":" + picked.minute.toString();
+      String hour, minute;
+      hour = picked.hour.toString();
+      if(picked.hour.toInt() < 10){
+        hour = "0" + hour;
+      }
+      minute = picked.minute.toString();
+      if(picked.hour.toInt() < 10){
+        minute = "0" + minute;
+      }
+      schedule.start = hour + ":" + minute;
       Toaster.create(_value);
       });
     presenter.saveSchedule(schedule, device);
@@ -189,12 +199,12 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Check
                 });
               },
               child: new ListTile(
-                title: new Text("Toggle"),
+                title: new Text("Command"),
                 trailing: new Switch(
-                  value: this.schedule.status,
+                  value: this.schedule.command,
                   onChanged: (bool value){
                     setState(() {
-                      this.schedule.status = value;
+                      this.schedule.command = value;
                       presenter.saveSchedule(schedule, device);
                     });
                   },

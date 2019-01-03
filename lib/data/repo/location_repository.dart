@@ -8,12 +8,12 @@ import '../model/schedule.dart';
 List <Location> startingList = 
  <Location> [
    new Location(
-     "127.0.0.1",
+     "asd",
      "Rumah",
      "http://www.for-example.org/img/main/forexamplelogo.png"
    ),
    new Location(
-    "127.0.0.1",
+     "asd",
     "Kantor",
     "http://www.for-example.org/img/main/forexamplelogo.png"
    )
@@ -22,6 +22,7 @@ List <Location> startingList =
 abstract class LocationRepository{
   Location findLocationByUID(String uid);
   Future<Location> getLocationByUID(Location location);
+  Future<String> getLocationPairingStatus(Location location);
   Future<List<Location>> fetch(User user);
   Future<List<Location>> save(Location location);
   Future<List<Location>> addDeviceOnLocation(Device device, Location location);
@@ -59,6 +60,15 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
+  Future<String> getLocationPairingStatus(Location location){
+    return getway.getPairingStatus(location).then(
+      (status){
+        return Future.value(status);
+      }
+    );
+  }
+
+  @override
   Future<List<Location>> fetch(User user) async {
     return getway.getLocations(user).then(
       (result){
@@ -76,6 +86,10 @@ class ProLocationRepository implements LocationRepository{
   Future<List<Location>> save(Location location){
     return getway.addLocation(location).then(
       (res){
+        print("location count: " + locations.length.toString());
+        if(res == null){
+          return Future.value(locations);
+        }
         locations.add(location);
         return Future.value(locations);
       }
@@ -159,6 +173,12 @@ class ProLocationRepository implements LocationRepository{
 class MockLocationRepository implements LocationRepository{
   List<Location> locations;
   RestGetway getway;
+
+  @override
+  Future<String> getLocationPairingStatus(Location location) {
+      // TODO: implement getLocationPairingStatus
+      return null;
+    }
 
   @override
   Future<List<Schedule>> getSchedules(Device device){

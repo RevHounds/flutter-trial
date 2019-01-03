@@ -19,6 +19,7 @@ class RestGetway{
   static final getTokenUrl = baseUrl + "/get-token";
   static final registerUrl = baseUrl + "/register";
   static final addLocationUrl = baseUrl + "/add-location";
+  static final getLocationPairingStatus = baseUrl + "/get-pairing-status";
   static final getLocationUrl = baseUrl + "/get-locations";
   static final deleteLocationUrl = baseUrl + "/delete-location";
   static final getDevicesUrl = baseUrl + "/get-devices";
@@ -86,7 +87,7 @@ class RestGetway{
         if(res["error"] == "false"){
           User user = new User.fromMap(res["user"]);
           getToken(user).then((status){
-            if(status) print("yeay");
+            if(status) print(status);
           });
           return Future.value(user);
         }
@@ -159,6 +160,21 @@ class RestGetway{
         );
   }
 
+  Future<String> getPairingStatus(Location location) async {
+    return NetworkUtils().post(getLocationPairingStatus,
+      body: {
+        "id" : location.uid
+      },
+      headers: {
+        "authorization" : "Bearer " + _authenticationKey
+      }
+    ).then(
+      (res){
+        return Future.value(res["status"]);
+      }
+    );
+  }
+
    Future<Location> addLocation(Location location){
     print("Adding new location to user's account");
     print(_authenticationKey);
@@ -171,7 +187,6 @@ class RestGetway{
       "id" : location.uid,
       "name" : location.name,
       "image" : location.picture,
-      "ip" : location.ip,
       "userid" : _userId
     },  
       headers: {
@@ -180,7 +195,8 @@ class RestGetway{
     ).then(
       (res){
         print(res.toString());
-        if(res["error"] == "false"){          
+        if(res["error"] == "false"){
+          print("Location id: " + location.uid);
           return Future.value(location);
         }
         return Future.value(null);
@@ -360,9 +376,10 @@ class RestGetway{
       "id" : schedule.uid,
       "start" : schedule.start,
       "command" : schedule.command,
-      "status" : schedule.status,
+      "status" : schedule.status.toString(),
       "days" : schedule.repeatString,
-      "deviceid" : device.uid
+      "deviceid" : device.uid,
+      "port" : device.port
     },  
       headers: {
         "authorization" : "Bearer " + _authenticationKey
@@ -405,7 +422,7 @@ class RestGetway{
       "id" : schedule.uid,
       "start" : schedule.start,
       "command" : schedule.command,
-      "status" : schedule.status,
+      "status" : schedule.status.toString(),
       "days" : schedule.repeatString,
       "deviceid" : device.uid
     },  

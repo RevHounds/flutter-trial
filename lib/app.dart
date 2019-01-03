@@ -35,6 +35,8 @@ class MainMenu extends StatefulWidget{
 
 class MainMenuState extends State<MainMenu> implements LogoutContract{
   MainMenuPresenter presenter;
+  LocationList locationList = new LocationList();
+  var container;
 
   void init() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -86,7 +88,6 @@ class MainMenuState extends State<MainMenu> implements LogoutContract{
                 pref.setBool("isLoggedIn", false).then((state){
                   print("logged off");
                   presenter.logout();
-                  Navigator.of(context).pop();
                 });
               },
             ),
@@ -100,19 +101,28 @@ class MainMenuState extends State<MainMenu> implements LogoutContract{
     _neverSatisfied();
   }
 
+  void refreshData(){
+    locationList.presenter.loadLocations(container.user);
+  }
+
   @override
   Widget build(BuildContext context){
+    container = StateContainer.of(context);
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Main Menu"),
         actions: <Widget>[
+          new IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: refreshData,
+          ),
           new IconButton(
             icon: Icon(Icons.power_settings_new),
             onPressed: _logout,
           )
         ],
       ),
-      body: new LocationList(),
+      body: locationList,
       floatingActionButton: new FloatingActionButton(
         child: new Icon(Icons.add),
         onPressed: (){_gotoAddLocationPage(context);
@@ -136,17 +146,17 @@ class MainMenuState extends State<MainMenu> implements LogoutContract{
 
 class LocationList extends StatefulWidget{
   @override
-  LocationListState createState() => new LocationListState();
+  LocationListPresenter presenter;
+  LocationListState createState() => new LocationListState(this.presenter);
 }
 
 class LocationListState extends State<LocationList> implements LocationListContract{
-  List<Location> locations;
   LocationListPresenter presenter;
+  List<Location> locations;
   bool isSearching;
   var container;
 
-
-  LocationListState(){
+  LocationListState(this.presenter){
     isSearching = true;
     presenter = new LocationListPresenter(this);
   }
@@ -181,6 +191,9 @@ class LocationListState extends State<LocationList> implements LocationListContr
   Widget build(BuildContext context){
     container = StateContainer.of(context);
     locations = container.locations;
+
+    if(locations != null)
+      locations.removeWhere((location) => location.status == "pending");
 
     print("Done Called");
 

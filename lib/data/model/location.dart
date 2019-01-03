@@ -3,28 +3,27 @@ import '../../utils/uid.dart';
 
 class Location{
 	String uid;
-	String ip;
 	String name;
 	String picture;
+  String status;
 
   List<Device> devices;
 
-	Location(this.ip, this.name, this.picture) {
-      uid = new IDGenerator().generateUID();
-      devices = new List<Device>();
-    }
+	Location(this.uid, this.name, this.picture) {
+    devices = new List<Device>();
+    status = "pending";
+  }
 
   Location.fromMap(Map<String, dynamic> map){
     this.uid = map["Id"];
     this.name = map["Name"];
     this.picture = "http://www.for-example.org/img/main/forexamplelogo.png";
-    this.ip = map["Ip"];
     this.devices = new List<Device>();
   }
 
   static Location fromView(LocationAddView view)  {
     print("Try make location");
-    return new Location(view.ip, view.name, view.picture);
+    return new Location(view.uid, view.name, view.picture);
   }
 
   bool isEqualWithLocation(Location anotherLocation){
@@ -38,13 +37,13 @@ class Location{
 
 class LocationView extends Location{
   LocationView(
-		  String ip,
+		  String uid,
 			String name,
 			String picture
-  ) : super(ip, name, picture);
+  ) : super(uid, name, picture);
 }
 
 class LocationAddView extends LocationView{
-  LocationAddView(String name, String address)
-    : super(address, name, "http://www.for-example.org/img/main/forexamplelogo.png");
+  LocationAddView(String uid, String name)
+    : super(uid, name, "http://www.for-example.org/img/main/forexamplelogo.png");
 }

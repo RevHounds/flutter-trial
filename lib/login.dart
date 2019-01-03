@@ -9,7 +9,6 @@ import 'view/app_presenter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget{
-  
   @override
   State<LoginPage> createState() => new LoginPageState();
 }

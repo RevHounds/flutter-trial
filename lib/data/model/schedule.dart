@@ -3,17 +3,17 @@ import '../../utils/uid.dart';
 class Schedule{
   String uid;
   String start;
-  String command;
+  bool _command;
   Map<String, bool> repeatDay;
   String repeatString;
   bool status;
 
   Schedule({
     this.start = "00:00",
-    this.command = "On",
     this.repeatString = "None",
     this.status = true
   }){
+    this._command = true;
     this.uid = new IDGenerator().generateUID();
     repeatDay = new Map<String, bool>();
     List<String> days = repeatString.split(" ");
@@ -45,8 +45,13 @@ class Schedule{
     repeatDay = new Map<String, bool>();
     this.uid = map["Id"];
     this.start = map["Start"];
-    this.command  = map["Command"];
-    this.status = map["Status"];
+    this._command  = true ? false : map["Command"] == "On";
+    String stats = map["Status"];
+    if(stats.toLowerCase() == "true"){
+      this.status = true;
+    } else{
+      this.status = false;
+    }
     this.repeatString = map["Days"];
     List<String> days = repeatString.split(" ");
     
@@ -113,7 +118,7 @@ class Schedule{
     if(repeatDay["Friday"]) res += "Friday, ";
     if(repeatDay["Saturday"]) res += "Saturday, ";
     if(repeatDay["Sunday"]) res += "Sunday ";
-    if (res.length >=20){
+    if (res.length >= 20){
       res = res.substring(0,17);
       res += ". . .  ";
     }
@@ -140,5 +145,16 @@ class Schedule{
     for(String day in days){
       repeatDay[day] = true;
     }
+  }
+
+  get command{
+    if(this._command){
+      return "On";
+    } else{
+      return "Off";
+    }
+  }
+  set command(bool value){
+    this._command = value;
   }
 }
