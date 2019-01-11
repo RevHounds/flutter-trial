@@ -15,16 +15,16 @@ abstract class AddLocationContract{
 
 abstract class LocationDetailContract{
   void onLoadLocation(Location location);
-  void onChangeState(Location location);
+  void onChangeState(List<Location> locations);
 }
 
 abstract class LocationDetailAppBarContract{
-  void onDeleteLocation(Location location);
+  void onDeleteLocation(List<Location> location);
 }
 
 abstract class LocationPairingStatusContract{
-  void onPairingFinished(Location location);
-  void onPairingNotFinished(Location location);
+  void onPairingFinished(Location locations);
+  void onPairingNotFinished(Location locations);
 }
 
 class LocationListPresenter{
@@ -38,16 +38,16 @@ class LocationListPresenter{
   void loadLocations(User user){
     assert(_view != null);
 
-    _repo.fetch(user)
-        .then((locations){
-            if(locations == null){
-              _view.onErrorLoadLocation();
-              return;
-            }
-            int n = locations.length;
-            print("Location fetched, count: $n");
-            _view.onLoadLocationComplete(locations);
-        });
+    _repo.getLocationsOfUser(user)
+      .then((locations){
+          if(locations == null){
+            _view.onErrorLoadLocation();
+            return;
+          }
+          int n = locations.length;
+          print("Location fetched, count: $n");
+          _view.onLoadLocationComplete(locations);
+      });
   }
 }
 
@@ -63,11 +63,12 @@ class AddLocationPresenter{
     Location location = Location.fromView(newLocation);
     print("Location created");
     
-    _repo.save(location).then((locations){
-      int n = locations.length;
-      print("Location saved! count: $n");
-      _view.onSaveLocation(locations);
-    });
+    _repo.saveLocation(location).
+      then((locations){
+        int n = locations.length;
+        print("Location saved! count: $n");
+        _view.onSaveLocation(locations);
+      });
   }
 }
 
@@ -79,22 +80,22 @@ class LocationDetailPresenter{
     this._repo = Injector().locationRepository;
   }
 
-  void loadLocationByUID(Location location){
+  void changeState(Location location, Device device){
+    _repo.changeDeviceStateOnLocation(device, location)
+      .then((locations){
+        _view.onChangeState(locations);
+      });
+  }
+  
+   void loadLocationByUID(Location location){
     String uid = location.uid;
     print("ini lagi cobain cari si $uid");
 
-    _repo.getLocationByUID(location)
+    _repo.getDevicesOnLocation(location)
       .then((location){
         print("location found!");
         _view.onLoadLocation(location);
       });
-  }
-
-  void changeState(Location location, Device device){
-    _repo.changeDeviceStateOnLocation(device, location)
-        .then((location){
-          _view.onChangeState(location);
-        });
   }
 }
 
@@ -106,8 +107,8 @@ class LocationAppBarPresenter{
 
   void deleteLocation(String uid){
     _repo.deleteLocation(uid)
-      .then((location){ 
-        _view.onDeleteLocation(location);
+      .then((locations){ 
+        _view.onDeleteLocation(locations);
       });
   }
 }
@@ -121,7 +122,7 @@ class LocationPairingPresenter{
   void checkStatus(Location location){
     _repo.getLocationPairingStatus(location).then(
       (status){
-        if(status == "owned"){
+        if(status){
           _view.onPairingFinished(location);
         } else{
           _view.onPairingNotFinished(location);

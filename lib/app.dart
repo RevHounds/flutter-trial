@@ -2,14 +2,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'view/location_presenter.dart';
 import 'data/model/location.dart';
-import 'data/model/device.dart';
-import 'data/model/schedule.dart';
 import 'utils/container.dart';
 import './add_location_page.dart';
 import 'location_detail.dart';
 import 'login.dart';
-import 'device_detail.dart';
-import 'schedule_detail.dart';
 import './view/app_presenter.dart';
 
 class Myapp extends StatelessWidget{
@@ -22,6 +18,8 @@ class Myapp extends StatelessWidget{
     homePage = new LoginPage();
 
     return new MaterialApp(
+      builder: (context, child) =>
+          MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child),
       title: "Smart Home",
       home: homePage
     );
@@ -49,7 +47,6 @@ class MainMenuState extends State<MainMenu> implements LogoutContract{
     Navigator.of(context).pushReplacement(
       new MaterialPageRoute(
         builder: (context){
-          print("sampe sini lho cok udahan");
           return new LoginPage();
         }
       ));

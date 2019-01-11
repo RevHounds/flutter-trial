@@ -160,7 +160,7 @@ class RestGetway{
         );
   }
 
-  Future<String> getPairingStatus(Location location) async {
+  Future<bool> getPairingStatus(Location location) async {
     return NetworkUtils().post(getLocationPairingStatus,
       body: {
         "id" : location.uid
@@ -170,7 +170,9 @@ class RestGetway{
       }
     ).then(
       (res){
-        return Future.value(res["status"]);
+        bool status = false;
+        res["success"] == "true" ? status = true : status = false;
+        return status;
       }
     );
   }
@@ -204,7 +206,7 @@ class RestGetway{
     );
   }
 
-  Future<String> deleteLocation(String uid){
+  Future<bool> deleteLocation(String uid){
     print(uid);
     return NetworkUtils().post(deleteLocationUrl, body: {
         "id" : uid
@@ -214,10 +216,9 @@ class RestGetway{
       }
     ).then((res){
       print(res.toString());
-      if(res["error"] == "false")
-        return Future.value(uid);
-      else
-        return Future.value("not found");
+      bool status;
+      res["error"] == "false" ? status = false : status = true;
+      return Future.value(status);
     });
   }
 
@@ -285,7 +286,7 @@ class RestGetway{
     );
   }
 
-  Future<String> deleteDevice(String uid){
+  Future<bool> deleteDevice(String uid){
     print(uid);
     return NetworkUtils().post(deleteDeviceUrl, body: {
         "id" : uid
@@ -294,11 +295,9 @@ class RestGetway{
         "authorization" : "Bearer " + _authenticationKey
       }
     ).then((res){
-      print(res.toString());
-      if(res["error"] == "false")
-        return Future.value(uid);
-      else
-        return Future.value("not found");
+      bool status;
+      res["error"] == "false" ? status = false : status = true;
+      return Future.value(status);
     });
   }
 

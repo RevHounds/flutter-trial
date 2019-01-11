@@ -21,13 +21,14 @@ List <Location> startingList =
 
 abstract class LocationRepository{
   Location findLocationByUID(String uid);
-  Future<Location> getLocationByUID(Location location);
-  Future<String> getLocationPairingStatus(Location location);
-  Future<List<Location>> fetch(User user);
-  Future<List<Location>> save(Location location);
+  Future<Location> getDevicesOnLocation(Location location);
+  Future<bool> getLocationPairingStatus(Location location);
+  Future<List<Location>> getLocationsOfUser(User user);
+  Future<List<Location>> saveLocation(Location location);
   Future<List<Location>> addDeviceOnLocation(Device device, Location location);
-  Future<Location> changeDeviceStateOnLocation(Device device, Location location);
-  Future<Location> deleteLocation(String uid);
+  Future<List<Location>> changeDeviceStateOnLocation(Device device, Location location);
+  Future<List<Location>> deleteLocation(String uid);
+  Future<List<Location>> deleteDevice(Device device);
   Future<List<Schedule>> getSchedules(Device device);
   Future<Schedule> addScheduleOnDevice(Schedule schedule, Device device);
   Future<Schedule> updateScheduleOnDevice(Schedule schedule, Device device);
@@ -50,7 +51,7 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<Location> getLocationByUID(Location location){
+  Future<Location> getDevicesOnLocation(Location location){
     return getway.getDevices(location).then(
       (devices){
         location.devices = devices;
@@ -60,7 +61,7 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<String> getLocationPairingStatus(Location location){
+  Future<bool> getLocationPairingStatus(Location location){
     return getway.getPairingStatus(location).then(
       (status){
         return Future.value(status);
@@ -69,7 +70,7 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<List<Location>> fetch(User user) async {
+  Future<List<Location>> getLocationsOfUser(User user) async {
     return getway.getLocations(user).then(
       (result){
         if(result == null){
@@ -83,10 +84,11 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<List<Location>> save(Location location){
+  Future<List<Location>> saveLocation(Location location){
     return getway.addLocation(location).then(
       (res){
         print("location count: " + locations.length.toString());
+
         if(res == null){
           return Future.value(locations);
         }
@@ -112,28 +114,51 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<Location> changeDeviceStateOnLocation(Device device, Location location){
+  Future<List<Location>> changeDeviceStateOnLocation(Device device, Location location){
     return getway.updateDevice(device, location).then(
       (device){
-        for(int i = 0; i<location.devices.length; i++){
-          if(location.devices[i].uid == device.uid){
-            location.devices[i] = (device);
-            return Future.value(location);
+        for(int j = 0; j<locations.length; j++){
+          for(int i = 0; i<locations[j].devices.length; i++){
+            if(locations[j].devices[i].uid == device.uid){
+              locations[j].devices[i] = device;
+            }
           }
         }
+        return Future.value(locations);
       }
     );
   }
 
   @override
-  Future<Location> deleteLocation(String uid){
+  Future<List<Location>> deleteLocation(String uid){
     print(uid);
     return getway.deleteLocation(uid).then(
-      (resId){
-        print(resId);
-        if(resId == "not found")
-          return null;
-        return Future.value(locations.removeAt(locations.indexOf(findLocationByUID(uid))));
+      (isSuccess){
+        print(isSuccess);
+        if(!isSuccess){
+          return locations;
+        }
+        locations.removeAt(locations.indexOf(findLocationByUID(uid)));
+        return Future.value(locations);
+    });
+  }
+
+  @override
+  Future<List<Location>> deleteDevice(Device device){
+    return getway.deleteDevice(device.uid).then(
+      (isSuccess){
+        if(!isSuccess){
+          return locations;
+        }
+                
+        for(int j = 0; j<locations.length; j++){
+          for(int i = 0; i<locations[j].devices.length; i++){
+            if(locations[j].devices[i].uid == device.uid){
+              locations[j].devices.removeAt(i);
+            }
+          }
+        }
+        return Future.value(locations);
     });
   }
 
@@ -175,7 +200,13 @@ class MockLocationRepository implements LocationRepository{
   RestGetway getway;
 
   @override
-  Future<String> getLocationPairingStatus(Location location) {
+    Future<List<Location>> deleteDevice(Device device) {
+      // TODO: implement deleteDevice
+      return null;
+    }
+
+  @override
+  Future<bool> getLocationPairingStatus(Location location) {
       // TODO: implement getLocationPairingStatus
       return null;
     }
@@ -226,7 +257,7 @@ class MockLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<Location> getLocationByUID(Location location){
+  Future<Location> getDevicesOnLocation(Location location){
     for (var location in locations) {
       if(location.isEqualWithUID(location.uid)) 
         return Future.value(location);
@@ -235,7 +266,7 @@ class MockLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<List<Location>> fetch(User user){
+  Future<List<Location>> getLocationsOfUser(User user){
     return Future.value(locations);
   }
 
@@ -254,36 +285,27 @@ class MockLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<List<Location>> save(Location location){
+  Future<List<Location>> saveLocation(Location location){
     locations.add(location);
     print("Location saved");
     return new Future.value(locations);
   }
 
   @override
-  Future<Location> changeDeviceStateOnLocation(Device device, Location location){
-    String location_uid = location.uid;
-    String device_uid = device.uid;
-    Location locationFound = null;
-    
-    for (var location in locations) {
-      if(location.isEqualWithUID(location_uid)){
-        for(var device in location.devices){
-          if(device.uid == device_uid){
-            String name = location.name;
-            print("location found, device state changed on $name");
-            device.status = !device.status;
-            locationFound = location;
-            return Future.value(locationFound);
-          }
+  Future<List<Location>> changeDeviceStateOnLocation(Device device, Location location){
+    for(int j = 0; j<locations.length; j++){
+      for(int i = 0; i<locations[j].devices.length; i++){
+        if(locations[j].devices[i].uid == device.uid){
+          locations[j].devices[i] = device;
         }
       }
     }
-    return Future.value(null);
+    return Future.value(locations);
   }
 
   @override
-  Future<Location> deleteLocation(String uid){
-    return Future.value(locations.removeAt(locations.indexOf(findLocationByUID(uid))));
+  Future<List<Location>> deleteLocation(String uid){
+    locations.removeAt(locations.indexOf(findLocationByUID(uid)));
+    return Future.value(locations);
   }
 }

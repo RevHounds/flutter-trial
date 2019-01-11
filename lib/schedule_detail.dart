@@ -5,41 +5,6 @@ import 'utils/container.dart';
 import 'view/schedule_presenter.dart';
 import 'utils/toast.dart';
 
-class CheckBoxTile extends StatefulWidget{
- String title;
- bool value;
- CheckBoxTilePresenter presenter;
-
- CheckBoxTile(this.title, this.value, this.presenter);
-
-  @override
-  State<CheckBoxTile> createState() => new CheckBoxTileState(this.title, this.value, this.presenter);
-}
-
-class CheckBoxTileState extends State<CheckBoxTile>{
-  String title;
-  bool value;
-  CheckBoxTilePresenter presenter;
-  CheckBoxTileState(this.title, this.value, this.presenter);
-
-  @override
-  Widget build(BuildContext context){
-    return new ListTile(
-        title: new Text(title),
-        trailing: new Checkbox(
-          tristate: false,
-          value: value,
-          onChanged: (bool res){
-            setState(() {
-              value = res;
-              presenter.changeValue(title, res);
-            });
-          },
-        ),
-      );
-  }
-}
-
 class ScheduleDetailPage extends StatefulWidget{
   static const String routeName = "/Schedule-detail";
   Schedule schedule;
@@ -50,8 +15,6 @@ class ScheduleDetailPage extends StatefulWidget{
   @override
   State<ScheduleDetailPage> createState() => new ScheduleDetailPageState(this.schedule, this.device);
 }
-
-
 
 class ScheduleDetailPageState extends State<ScheduleDetailPage> implements CheckBoxTileContract{
   var container;
@@ -92,7 +55,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Check
         hour = "0" + hour;
       }
       minute = picked.minute.toString();
-      if(picked.hour.toInt() < 10){
+      if(picked.minute.toInt() < 10){
         minute = "0" + minute;
       }
       schedule.start = hour + ":" + minute;
@@ -161,7 +124,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Check
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Schedule Detail')
+        title: new Text(device.name + '\'s Schedule')
       ),
       body: new ListView(
         children: <Widget>[
@@ -201,10 +164,10 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Check
               child: new ListTile(
                 title: new Text("Command"),
                 trailing: new Switch(
-                  value: this.schedule.command,
+                  value: this.schedule.commandBool,
                   onChanged: (bool value){
                     setState(() {
-                      this.schedule.command = value;
+                      this.schedule.commandBool = value;
                       presenter.saveSchedule(schedule, device);
                     });
                   },
@@ -215,5 +178,40 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Check
         ],
       )
     );
+  }
+}
+
+class CheckBoxTile extends StatefulWidget{
+ String title;
+ bool value;
+ CheckBoxTilePresenter presenter;
+
+ CheckBoxTile(this.title, this.value, this.presenter);
+
+  @override
+  State<CheckBoxTile> createState() => new CheckBoxTileState(this.title, this.value, this.presenter);
+}
+
+class CheckBoxTileState extends State<CheckBoxTile>{
+  String title;
+  bool value;
+  CheckBoxTilePresenter presenter;
+  CheckBoxTileState(this.title, this.value, this.presenter);
+
+  @override
+  Widget build(BuildContext context){
+    return new ListTile(
+        title: new Text(title),
+        trailing: new Checkbox(
+          tristate: false,
+          value: value,
+          onChanged: (bool res){
+            setState(() {
+              value = res;
+              presenter.changeValue(title, res);
+            });
+          },
+        ),
+      );
   }
 }

@@ -45,6 +45,10 @@ class DeviceDetailPagePresenter{
     this._repo = Injector().locationRepository;
   }
 
+  void deleteDevice(Device device){
+    _repo.deleteDevice(device);
+  }
+
   void addSchedule(Device device){
     _repo.addScheduleOnDevice(new Schedule(), device).then(
       (schedule){
@@ -76,6 +80,5 @@ class ScheduleCardPresenter{
         _view.onScheduleUpdated(schedule);
       }
     );
-
   }
 }

@@ -5,37 +5,25 @@ import 'utils/toast.dart';
 import 'utils/container.dart';
 import 'app.dart';
 
-class PairingStatusPage extends StatelessWidget{
-  Location location;
+
+class PairingStatusPage extends StatefulWidget{
   static const String routeName = "/pairing-status";
-
-  PairingStatusPage(this.location){
-    print("gaero be e");
-  }
-
-  Widget build(BuildContext context){
-    return new PairingStatusContainer(this.location);
-  }
-}
-
-
-class PairingStatusContainer extends StatefulWidget{
   Location location;
-  PairingStatusContainer(this.location){
+  PairingStatusPage(this.location){
     print("Right here buddy");
     print("Location id: " + this.location.uid);
   }
   
   @override
-  State<PairingStatusContainer> createState() => new PairingStatusContainerState(this.location);
+  State<PairingStatusPage> createState() => new PairingStatusPageState(this.location);
 }
 
-class PairingStatusContainerState extends State<PairingStatusContainer> implements LocationPairingStatusContract{
+class PairingStatusPageState extends State<PairingStatusPage> implements LocationPairingStatusContract{
   Location location;
   LocationPairingPresenter presenter;
   var container;
 
-  PairingStatusContainerState(this.location){
+  PairingStatusPageState(this.location){
     print("anake yo wes mari");
     this.presenter = new LocationPairingPresenter(this);
   }
@@ -48,10 +36,12 @@ class PairingStatusContainerState extends State<PairingStatusContainer> implemen
 
     for(Location loc in conLoc){
       if(loc.uid == location.uid){
-        loc = location;
+        location.status = "owned";
         break;
       }
     }
+
+    container.locations = conLoc;
 
     Navigator.of(context).pop();
   }

@@ -63,13 +63,58 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
     presenter.addSchedule(this.device);
   }
 
+  void _deleteDevice(){
+    popUpDeleteDevice();
+  }
+
+  Future<Null> popUpDeleteDevice() async {
+    String deviceName = this.device.name;
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('Delete Device'),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text("Are you sure you wanted to delete $deviceName?")
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton( 
+              child: new Text("Delete"),
+              onPressed: () {
+                presenter.deleteDevice(this.device);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Device Detail')
+        title: new Text(device.name + ' Detail'),
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: _deleteDevice,
+            )
+        ],
       ),
       body: new ListView(
         children: _generateScheduleList(schedules)

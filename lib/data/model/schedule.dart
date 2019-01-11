@@ -45,7 +45,11 @@ class Schedule{
     repeatDay = new Map<String, bool>();
     this.uid = map["Id"];
     this.start = map["Start"];
-    this._command  = true ? false : map["Command"] == "On";
+    if (map["Command"].toString().toLowerCase() == "on"){
+      this._command = true;
+    } else {
+      this.command = false;
+    }    
     String stats = map["Status"];
     if(stats.toLowerCase() == "true"){
       this.status = true;
@@ -155,6 +159,14 @@ class Schedule{
     }
   }
   set command(bool value){
+    this._command = value;
+  }
+
+  get commandBool{
+    return this._command;
+  }
+
+  set commandBool(bool value){
     this._command = value;
   }
 }

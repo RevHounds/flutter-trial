@@ -30,12 +30,12 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
   }
 
   @override
-  void onDeleteLocation(Location location){
-    container.deleteLocation(location);
+  void onDeleteLocation(List<Location> locations){
+    container.locations = locations;
     Navigator.of(context).pop();
   }
 
-  Future<Null> _neverSatisfied() async {
+  Future<Null> popUpDeleteLocation() async {
     String locationName = location.name;
     return showDialog<Null>(
       context: context,
@@ -71,7 +71,7 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
   }
 
   void deleteLocation(){
-    _neverSatisfied();
+    popUpDeleteLocation();
   }
 
   @override
@@ -148,14 +148,17 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
   }
 
   @override
-  void onChangeState(Location location){
-    for(int i = 0; i<container.locations.length; i++){
-      if(container.locations[i].isEqualWithLocation(location)){
-        container.locations[i] = location;
+  void onChangeState(List<Location> locations){
+    container.locations = locations;
+
+    for(location in locations){
+      if(this.location.uid == location.uid){
+        this.location = location;
       }
     }
+
     setState(() {
-      this.devices = location.devices;      
+      this.devices = location.devices;
     });
   }
 
