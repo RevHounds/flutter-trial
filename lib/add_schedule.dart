@@ -5,16 +5,16 @@ import './data/model/schedule.dart';
 import './data/model/location.dart';
 import './utils/container.dart';
 
-class addschedulePage extends StatefulWidget{
+class AddSchedulePage extends StatefulWidget{
   static const String routeName = "/schedule-detail";
   Device device;
-  addschedulePage(this.device);
+  AddSchedulePage(this.device);
 
   @override
-  State<addschedulePage> createState() => new addschedulePageState(this.device);
+  State<AddSchedulePage> createState() => new AddSchedulePageState(this.device);
 
 }
-class addschedulePageState extends State<addschedulePage> implements AddSchedulePageContract{
+class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedulePageContract{
   Device device;
   Schedule schedule;
   AddSchedulePagePresenter presenter;
@@ -23,7 +23,7 @@ class addschedulePageState extends State<addschedulePage> implements AddSchedule
 
   bool isLoading = true;
 
-  addschedulePageState(this.device);
+  AddSchedulePageState(this.device);
   
   @override
   void onScheduleSaved(List<Location> locations){
