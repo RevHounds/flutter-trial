@@ -4,6 +4,8 @@ import './data/model/device.dart';
 import './data/model/schedule.dart';
 import './data/model/location.dart';
 import './utils/container.dart';
+import './widgets/day_button.dart';
+import './widgets/time_cards.dart';
 
 class AddSchedulePage extends StatefulWidget{
   static const String routeName = "/schedule-detail";
@@ -188,97 +190,3 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
   }
 }
 
-class DayButton extends StatefulWidget{
-  final String day;
-  final Schedule schedule;
-  DayButton(this.day, this.schedule);
-
-  @override
-  State<DayButton> createState() => new DayButtonState(this.day, this.schedule);
-}
-
-class DayButtonState extends State<DayButton> implements DayButtonContract{
-  final String day;
-  String shortDay;
-  bool currentState;
-  Schedule schedule;
-  DayButtonPresenter presenter;
-
-  DayButtonState(this.day, this.schedule){
-    shortDay = day.substring(0,2);
-    this.currentState = schedule.repeatDay[day] || false;
-    this.presenter = new DayButtonPresenter(this);
-  }
-
-  @override
-  void onRepeatPressed(bool value){
-    this.currentState = value;      
-    schedule.repeatDay[day] = value;
-    setState(() {
-    });
-  }
-
-  @override
-  Widget build(BuildContext context){
-    return new FlatButton(
-      color: currentState ? Colors.blue : Colors.white,
-      child: new Text(
-        shortDay,
-        style: new TextStyle(
-          fontSize: 18,
-          color: currentState ? Colors.white : Colors.blue
-        )  
-      ),
-      shape: new CircleBorder(),
-      onPressed: (){
-        presenter.selectDay(this.day, this.schedule);
-        setState(() {
-          this.currentState = !this.currentState;          
-        });
-      },
-    );
-  }
-}
-
-class TimeCards extends StatefulWidget{
-  final String title, time;
-
-  TimeCards(this.title, this.time);
-  
-  @override
-  State<TimeCards> createState() => new TimeCardsState(this.title, this.time);
-}
-
-class TimeCardsState extends State<TimeCards>{
-  String title, time;
-
-  TimeCardsState(this.title, this.time);
-
-  @override
-  Widget build(BuildContext context){
-    return new Card(
-      margin: new EdgeInsets.only(left: 5.0, right: 5.0),
-      child: new Padding(
-        padding: new EdgeInsets.only(top: 10.0, left: 10.0, bottom: 10.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            new Text(
-              this.title, 
-              style: new TextStyle(
-                fontSize: 18,
-                )
-            ),
-            new Text(
-              this.time,
-              style: new TextStyle(
-                fontSize: 64,
-                height: 0.9,
-              )
-            ),
-          ],
-        )
-      )
-    );
-  }
-}
