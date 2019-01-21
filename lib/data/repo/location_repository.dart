@@ -31,8 +31,9 @@ abstract class LocationRepository{
   Future<List<Location>> deleteDevice(Device device);
   Future<List<Schedule>> getSchedules(Device device);
   Future<Schedule> addScheduleOnDevice(Schedule schedule, Device device);
-  Future<Schedule> updateScheduleOnDevice(Schedule schedule, Device device);
+  Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device);
   void deleteScheduleOnDevice(Schedule schedule, Device device);
+  Future<bool> changeRepeatOnSchedule(String day, Schedule schedule);
 }
 
 class ProLocationRepository implements LocationRepository{
@@ -181,10 +182,27 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<Schedule> updateScheduleOnDevice(Schedule schedule, Device device){
+  Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device){
     return getway.updateSchedule(schedule, device).then(
       (newSchedule){
-        return Future.value(newSchedule);
+        if (newSchedule == null)
+          return this.locations;
+        
+        for(int i = 0; i<device.schedules.length; i++){
+          if(schedule.uid == device.schedules[i].uid){
+            device.schedules[i] = schedule;
+          }
+        }
+
+        for(int j = 0; j<locations.length; j++){
+          for(int i = 0; i<locations[j].devices.length; i++){
+            if(device.uid == locations[j].devices[i].uid){
+              locations[j].devices[i] = device;
+              return locations;
+            }
+          }
+        }
+        return locations;
       }
     );
   }
@@ -192,6 +210,11 @@ class ProLocationRepository implements LocationRepository{
   @override
   void deleteScheduleOnDevice(Schedule schedule, Device device){
     getway.deleteSchedule(schedule.uid);
+  }
+
+  @override
+  Future<bool> changeRepeatOnSchedule(String day, Schedule schedule){
+    return Future.value(!schedule.repeatDay[day]);
   }
 }
 
@@ -230,10 +253,10 @@ class MockLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<Schedule> updateScheduleOnDevice(Schedule schedule, Device device){
+  Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device){
     return getway.updateSchedule(schedule, device).then(
       (newSchedule){
-        return Future.value(newSchedule);
+        return Future.value(locations);
       }
     );
   }
@@ -307,5 +330,10 @@ class MockLocationRepository implements LocationRepository{
   Future<List<Location>> deleteLocation(String uid){
     locations.removeAt(locations.indexOf(findLocationByUID(uid)));
     return Future.value(locations);
+  }
+
+  @override
+  Future<bool> changeRepeatOnSchedule(String day, Schedule schedule){
+    return Future.value(!schedule.repeatDay[day]);
   }
 }

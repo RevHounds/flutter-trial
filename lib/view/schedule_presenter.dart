@@ -2,6 +2,12 @@ import '../data/model/schedule.dart';
 import '../data/model/device.dart';
 import '../data/repo/location_repository.dart';
 import '../utils/injector.dart';
+import '../data/model/location.dart';
+
+abstract class ScheduleDetailPageContract{
+  void onScheduleSaved(List<Location> locations);
+  void onScheduleModified(Schedule newSchedule);
+}
 
 abstract class CheckBoxTileContract{
   void onValueChanged(String day, bool value);
@@ -14,7 +20,49 @@ abstract class DeviceDetailPageContract{
 }
 
 abstract class ScheduleCardContract{
-  void onScheduleUpdated(Schedule schedule);
+  void onScheduleUpdated(List<Location> locations);
+}
+
+abstract class DayButtonContract{
+  void onRepeatPressed(bool value);
+}
+
+class DayButtonPresenter{
+  DayButtonContract _view;
+  LocationRepository _repo;
+
+  DayButtonPresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void selectDay(String day, Schedule schedule){
+    _repo.changeRepeatOnSchedule(day, schedule).then(
+      (value){
+        _view.onRepeatPressed(value);
+      }
+    );
+  }
+}
+
+class ScheduleDetailPagePresenter{
+  ScheduleDetailPageContract _view;
+  LocationRepository _repo;
+
+  ScheduleDetailPagePresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void modifySchedule(Schedule schedule){
+    _view.onScheduleModified(schedule);
+  }
+
+  void saveSchedule(Schedule schedule, Device device){
+    _repo.updateScheduleOnDevice(schedule, device).then(
+      (locations){
+        _view.onScheduleSaved(locations);
+      }
+    );
+  }
 }
 
 class CheckBoxTilePresenter{
@@ -22,6 +70,32 @@ class CheckBoxTilePresenter{
   LocationRepository _repo;
 
   CheckBoxTilePresenter(this._view){
+    this._repo = new Injector().locationRepository;
+  }
+  void saveSchedule(Schedule newSchedule, Device device){
+    _repo.updateScheduleOnDevice(newSchedule, device).then(
+      (res){
+        _view.onScheduleSaved(newSchedule);
+    });
+  }
+
+  void changeValue(String title, bool value){
+
+  }
+
+  void deleteSchedule(Schedule schedule, Device device){
+    _repo.updateScheduleOnDevice(schedule, device).then(
+      (res){
+        _view.onScheduleSaved(schedule);
+    });
+  }
+}
+
+class CheckboxTilePresenter{
+  CheckBoxTileContract _view;
+  LocationRepository _repo;
+
+  CheckboxTilePresenter(this._view){
     this._repo = new Injector().locationRepository;
   }
 
@@ -33,6 +107,13 @@ class CheckBoxTilePresenter{
     _repo.updateScheduleOnDevice(newSchedule, device).then(
       (res){
         _view.onScheduleSaved(newSchedule);
+    });
+  }
+
+  void deleteSchedule(Schedule schedule, Device device){
+    _repo.updateScheduleOnDevice(schedule, device).then(
+      (res){
+        _view.onScheduleSaved(schedule);
     });
   }
 }

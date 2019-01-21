@@ -4,9 +4,8 @@ import 'utils/container.dart';
 import 'utils/rest-getway.dart';
 import 'view/app_presenter.dart';
 import 'data/model/user.dart';
-import 'app.dart';
 import 'utils/toast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'main_menu.dart';
 
 class RegisterPage extends StatefulWidget{
   @override

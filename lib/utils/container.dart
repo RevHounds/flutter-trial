@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../data/model/location.dart';
 import '../data/model/user.dart';
+import '../data/model/schedule.dart';
 
 class StateContainer extends StatefulWidget{
   Location onFocusLocation;
+  Schedule onFocusSchedule;
   List<Location> locations;
   Widget child;
   User user;
@@ -24,6 +26,7 @@ class StateContainer extends StatefulWidget{
 class StateContainerState extends State<StateContainer>{
   List<Location> locations;
   Location onFocusLocation;
+  Schedule onFocusSchedule;
   User user;
   bool errorLogin = false;
   bool loggedIn = false;
@@ -49,6 +52,7 @@ class StateContainerState extends State<StateContainer>{
         return location;
       }
     }
+    return null;
   }
   
 }

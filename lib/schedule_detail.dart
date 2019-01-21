@@ -1,179 +1,176 @@
 import 'package:flutter/material.dart';
-import 'data/model/schedule.dart';
-import 'data/model/device.dart';
-import 'utils/container.dart';
-import 'view/schedule_presenter.dart';
-import 'utils/toast.dart';
+import './view/schedule_presenter.dart';
+import './data/model/device.dart';
+import './data/model/schedule.dart';
+import './data/model/location.dart';
+import './utils/container.dart';
 
 class ScheduleDetailPage extends StatefulWidget{
   static const String routeName = "/Schedule-detail";
-  Schedule schedule;
   Device device;
-
-  ScheduleDetailPage(this.schedule, this.device);
+  ScheduleDetailPage(this.device);
 
   @override
-  State<ScheduleDetailPage> createState() => new ScheduleDetailPageState(this.schedule, this.device);
+  State<ScheduleDetailPage> createState() => new ScheduleDetailPageState(this.device);
+
 }
-
-class ScheduleDetailPageState extends State<ScheduleDetailPage> implements CheckBoxTileContract{
-  var container;
-  String timeRep = "";
-  CheckBoxTilePresenter presenter;
-  Schedule schedule;
-  Schedule tempSchedule;
-  ListView scheduleView = new ListView();
+class ScheduleDetailPageState extends State<ScheduleDetailPage> implements ScheduleDetailPageContract{
   Device device;
+  Schedule schedule;
+  ScheduleDetailPagePresenter presenter;
+  var container;
+  List<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-  ScheduleDetailPageState(this.schedule, this.device){
-    this.tempSchedule = new Schedule(repeatString: this.schedule.repeatString);
-    this.presenter = new CheckBoxTilePresenter(this);
+  bool isLoading = true;
+
+  ScheduleDetailPageState(this.device);
+  
+  @override
+  void onScheduleSaved(List<Location> locations){
+    container.locations = locations;
+    setState(() {      
+    }); 
   }
 
   @override
-  void onValueChanged(String day, bool value){
-    this.tempSchedule.changeValue(day, value);
+  void onScheduleModified(Schedule schedule){
+    this.schedule = schedule;
   }
 
-  @override
-  void onScheduleSaved(Schedule newSchedule){
-    setState(() {
-    });
-  }
-
-  String _value = "";
-  Future _selectTime() async {
-    TimeOfDay picked = await showTimePicker(
-      initialTime: TimeOfDay.now(),
+  Future<Null> popUpDeleteSchedule() async {
+    return showDialog<Null>(
       context: context,
-    );
-    if(picked != null) setState(() {
-      _value = picked.toString();
-      String hour, minute;
-      hour = picked.hour.toString();
-      if(picked.hour.toInt() < 10){
-        hour = "0" + hour;
-      }
-      minute = picked.minute.toString();
-      if(picked.minute.toInt() < 10){
-        minute = "0" + minute;
-      }
-      schedule.start = hour + ":" + minute;
-      Toaster.create(_value);
-      });
-    presenter.saveSchedule(schedule, device);
-  }
-
-  List<Widget> generateListOfDay(){
-    List<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    List<Widget> res = new List<Widget>();
-
-    for(String day in days){
-      print(day);
-      CheckBoxTile entry = new CheckBoxTile(day, schedule.repeatDay[day], presenter);
-      res.add(entry);
-    }
-    return res;
-  }
-
-  Future _selectDay() async{
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) => new AlertDialog(
-        title: new Text("Repeat"),
-        content: new SingleChildScrollView(
-          child: new ListBody(
-            children: generateListOfDay()
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('Delete Schedule'),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text("Are you sure you wanted to delete this schedule?")
+              ],
+            ),
           ),
-        ),
-        actions: <Widget>[
-          new FlatButton(
+          actions: <Widget>[
+            new FlatButton(
               child: new Text("Cancel"),
               onPressed: () {
-                setState(() {
-                  this.tempSchedule.copyRepeat(schedule.repeatDay);
-                });
                 Navigator.of(context).pop();
               },
             ),
             new FlatButton( 
-              child: new Text("Ok"),
+              child: new Text("Delete"),
               onPressed: () {
-                setState(() {
-                  this.schedule.copyRepeat(tempSchedule.repeatDay);
-                  print("Days: " + schedule.repeatString);
-                  presenter.saveSchedule(schedule, device);
-                });
+                // presenter.deleteSchedule(this.schedule);
                 Navigator.of(context).pop();
               },
             ),
-        ],
-      )
+          ],
+        );
+      },
     );
   }
 
-  @override
-  void initState() {
-      super.initState();
-    }
+  void _deleteSchedule(){
+    popUpDeleteSchedule();
+  }
+
+  void getSchedule(){
+    this.schedule = container.onFocusSchedule;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
+    
+    if(this.schedule == null){
+      getSchedule();
+    }
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(device.name + '\'s Schedule')
+        title: new Text(this.device.name + '\'s Schedule'),
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: _deleteSchedule,
+          )
+        ],
       ),
       body: new ListView(
         children: <Widget>[
-          new Card(
-            child: new FlatButton(
-              onPressed: _selectTime,
-              child: new Text(
-                schedule.start,
-                style: new TextStyle(
-                  fontSize: 100
-                ),
-              ),
+          new TimeCards("Start", this.schedule.start),
+          new ListTile(
+            contentPadding: new EdgeInsets.all(0.0),
+            leading: new Checkbox(
+              value: false,
             ),
+            title: new Text("Ranged schedule"),
           ),
+          new TimeCards("End", this.schedule.end),
           new Card(
-            child: new FlatButton(
-              onPressed: (){
-                setState(() {
-                  _selectDay();
-                  presenter.saveSchedule(schedule, device);
-                });
-              },
-              child: new ListTile(
-                title: new Text("Repeat"),
-                trailing: new Text(schedule.repeat),
-              ),
+            child: new Padding(
+              padding: new EdgeInsets.only(top: 10.0, left: 10.0, bottom: 10.0),
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Padding(
+                    padding: new EdgeInsets.only(bottom: 15.0),
+                    child: new Text(
+                      "Repeat",
+                      style: new TextStyle(
+                        fontSize: 18
+                      )
+                    ),
+                  ),
+                  new ButtonBar(
+                    alignment: MainAxisAlignment.center,
+                    children: days.map(
+                                (day)=> new DayButton(day, this.schedule)
+                              ).toList()
+                  )
+                ],
+              )
             )
           ),
-          new Card(
-            child: new FlatButton(
-              onPressed: (){
-                setState(() {
-                  this.schedule.status = !this.schedule.status;
-                  presenter.saveSchedule(schedule, device);
-                });
-              },
-              child: new ListTile(
-                title: new Text("Command"),
-                trailing: new Switch(
-                  value: this.schedule.commandBool,
-                  onChanged: (bool value){
-                    setState(() {
-                      this.schedule.commandBool = value;
-                      presenter.saveSchedule(schedule, device);
-                    });
-                  },
+          new Padding(padding: EdgeInsets.all(25),),
+          new Row(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              new MaterialButton(
+                child: new Text(
+                  "Save",
+                  style: new TextStyle(
+                    fontSize: 18,
+                    color: Colors.white
+                  ),
                 ),
+                color: Colors.blue,
+                height: 40,
+                minWidth: 120.0,
+                onPressed: (){
+                  print("saved!");
+                },
               ),
-            )
+              new MaterialButton(
+                child: new Text(
+                  "Cancel",
+                  style: new TextStyle(
+                    fontSize: 18,
+                    color: Colors.blue
+                  ),
+                ),
+                color: Colors.white,
+                height: 40,
+                minWidth: 120.0,
+                onPressed: (){
+                  print("canceled!");
+                },
+              )
+            ],
           )
         ],
       )
@@ -181,37 +178,97 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Check
   }
 }
 
-class CheckBoxTile extends StatefulWidget{
- String title;
- bool value;
- CheckBoxTilePresenter presenter;
-
- CheckBoxTile(this.title, this.value, this.presenter);
+class DayButton extends StatefulWidget{
+  final String day;
+  final Schedule schedule;
+  DayButton(this.day, this.schedule);
 
   @override
-  State<CheckBoxTile> createState() => new CheckBoxTileState(this.title, this.value, this.presenter);
+  State<DayButton> createState() => new DayButtonState(this.day, this.schedule);
 }
 
-class CheckBoxTileState extends State<CheckBoxTile>{
-  String title;
-  bool value;
-  CheckBoxTilePresenter presenter;
-  CheckBoxTileState(this.title, this.value, this.presenter);
+class DayButtonState extends State<DayButton> implements DayButtonContract{
+  final String day;
+  String shortDay;
+  bool currentState;
+  Schedule schedule;
+  DayButtonPresenter presenter;
+
+  DayButtonState(this.day, this.schedule){
+    shortDay = day.substring(0,2);
+    this.currentState = schedule.repeatDay[day] || false;
+    this.presenter = new DayButtonPresenter(this);
+  }
+
+  @override
+  void onRepeatPressed(bool value){
+    this.currentState = value;      
+    schedule.repeatDay[day] = value;
+    setState(() {
+    });
+  }
 
   @override
   Widget build(BuildContext context){
-    return new ListTile(
-        title: new Text(title),
-        trailing: new Checkbox(
-          tristate: false,
-          value: value,
-          onChanged: (bool res){
-            setState(() {
-              value = res;
-              presenter.changeValue(title, res);
-            });
-          },
-        ),
-      );
+    return new FlatButton(
+      color: currentState ? Colors.blue : Colors.white,
+      child: new Text(
+        shortDay,
+        style: new TextStyle(
+          fontSize: 18,
+          color: currentState ? Colors.white : Colors.blue
+        )  
+      ),
+      shape: new CircleBorder(),
+      onPressed: (){
+        presenter.selectDay(this.day, this.schedule);
+        setState(() {
+          this.currentState = !this.currentState;          
+        });
+      },
+    );
+  }
+}
+
+class TimeCards extends StatefulWidget{
+  final String title, time;
+
+  TimeCards(this.title, this.time);
+  
+  @override
+  State<TimeCards> createState() => new TimeCardsState(this.title, this.time);
+}
+
+class TimeCardsState extends State<TimeCards>{
+  String title, time;
+
+  TimeCardsState(this.title, this.time);
+
+  @override
+  Widget build(BuildContext context){
+    return new Card(
+      margin: new EdgeInsets.only(left: 5.0, right: 5.0),
+      child: new Padding(
+        padding: new EdgeInsets.only(top: 10.0, left: 10.0, bottom: 10.0),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            new Text(
+              this.title, 
+              style: new TextStyle(
+                fontSize: 18,
+                )
+            ),
+            new Text(
+              this.time,
+              style: new TextStyle(
+                fontSize: 64,
+                height: 0.9,
+              )
+            ),
+          ],
+        )
+      )
+    );
   }
 }

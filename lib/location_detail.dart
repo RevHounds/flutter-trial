@@ -77,7 +77,7 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
-    this.location = container.findLocationByUID(locationUID);
+    this.location = container.onFocusLocation;
 
     return new Scaffold(
       appBar: new AppBar(
@@ -101,7 +101,6 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
 
   void addDeviceTo(Location location){
     container.onFocusLocation = location;
-
     Navigator.push(
       context,
       new MaterialPageRoute(
@@ -158,7 +157,8 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
     }
 
     setState(() {
-      this.devices = location.devices;
+      if (this.devices != location.devices)
+        this.devices = location.devices;
     });
   }
 
@@ -196,7 +196,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
     return page;
   }
 
-  int getDeviceOn(){
+  int getDeviceOnStatusCount(){
     int count = 0;
     for(Device device in devices){
       if(device.status)
@@ -208,7 +208,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
   Widget buildHeader(){
     int device_on = 0, device_off = 0, device_total = 0;
     
-    device_on = getDeviceOn();
+    device_on = getDeviceOnStatusCount();
     device_total = devices.length;
     device_off = device_total - device_on;
 
@@ -289,6 +289,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
                 trailing: new Switch(
                   value: devices[index].status,
                   onChanged: (value){
+                    devices[index].status = !devices[index].status;
                     presenter.changeState(location, devices[index]);
                   },
                 ),

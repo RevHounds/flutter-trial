@@ -3,6 +3,8 @@ import '../../utils/uid.dart';
 class Schedule{
   String uid;
   String start;
+  String end;
+  bool isRanged;
   bool _command;
   Map<String, bool> repeatDay;
   String repeatString;
@@ -10,8 +12,10 @@ class Schedule{
 
   Schedule({
     this.start = "00:00",
+    this.end = "00:00",
     this.repeatString = "None",
-    this.status = true
+    this.status = true,
+    this.isRanged = false
   }){
     this._command = true;
     this.uid = new IDGenerator().generateUID();

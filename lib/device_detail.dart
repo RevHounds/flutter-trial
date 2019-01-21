@@ -3,6 +3,7 @@ import 'view/schedule_presenter.dart';
 import 'utils/container.dart';
 import 'data/model/device.dart';
 import 'data/model/schedule.dart';
+import 'data/model/location.dart';
 import 'schedule_detail.dart';
 
 class DeviceDetailPage extends StatefulWidget{
@@ -64,6 +65,7 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   }
 
   void _deleteDevice(){
+    print("deleting device");
     popUpDeleteDevice();
   }
 
@@ -139,15 +141,16 @@ class ScheduleCardState extends State<ScheduleCard> implements ScheduleCardContr
   Schedule schedule;
   Device device;
   ScheduleCardPresenter presenter;
+  var container;
 
   ScheduleCardState(this.schedule, this.device){
     this.presenter = new ScheduleCardPresenter(this);
   }
 
   @override
-  void onScheduleUpdated(Schedule schedule){
+  void onScheduleUpdated(List<Location> locations){
+    container.locations = locations;
     setState(() {
-          
     });
   }
 
@@ -161,17 +164,10 @@ class ScheduleCardState extends State<ScheduleCard> implements ScheduleCardContr
 
   @override
   Widget build(BuildContext context){
+    container = StateContainer.of(context);
+
     return new Card(
       child: new FlatButton(
-        onPressed: (){
-          Navigator.of(context).push(
-            new MaterialPageRoute(
-              builder: (context){
-                return new ScheduleDetailPage(schedule, device);
-              }
-            )
-          );
-        },
         child: new ListTile(
           title: new Text(schedule.start + " - " + schedule.command),
           subtitle: new Text(schedule.repeat),
@@ -180,7 +176,17 @@ class ScheduleCardState extends State<ScheduleCard> implements ScheduleCardContr
             value: schedule.status,
             onChanged: _onStatusChanged,
           ),
-        )
+        ),
+        onPressed: (){
+          Navigator.of(context).push(
+            new MaterialPageRoute(
+              builder: (context){
+                container.onFocusSchedule = schedule;
+                return new ScheduleDetailPage(device);
+              }
+            )
+          );
+        },
       ),
     );  
   }
