@@ -39,9 +39,9 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   }
 
   @override
-  void onScheduleAdded(Schedule schedule){
+  void onScheduleAdded(List<Location> locations){
+    container.locataions = locations;
     setState(() {
-      this.schedules.add(schedule);      
     });
   }
 
@@ -61,7 +61,15 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   }
 
   void _addSchedule(){
-    presenter.addSchedule(this.device);
+    Schedule newSchedule = new Schedule();
+    container.onFocusSchedule = newSchedule;
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+        builder: (context){
+          return new ScheduleDetailPage(this.device);
+        }
+      )
+    );
   }
 
   void _deleteDevice(){

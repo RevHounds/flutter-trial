@@ -30,9 +30,9 @@ abstract class LocationRepository{
   Future<List<Location>> deleteLocation(String uid);
   Future<List<Location>> deleteDevice(Device device);
   Future<List<Schedule>> getSchedules(Device device);
-  Future<Schedule> addScheduleOnDevice(Schedule schedule, Device device);
+  Future<List<Location>> addScheduleOnDevice(Schedule schedule, Device device);
   Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device);
-  void deleteScheduleOnDevice(Schedule schedule, Device device);
+  Future<List<Location>> deleteScheduleOnDevice(Schedule schedule, Device device);
   Future<bool> changeRepeatOnSchedule(String day, Schedule schedule);
 }
 
@@ -173,16 +173,35 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<Schedule> addScheduleOnDevice(Schedule schedule, Device device){
+  Future<List<Location>> addScheduleOnDevice(Schedule schedule, Device device){
     return getway.addSChedule(schedule, device).then(
       (newSchedule){
-        return Future.value(newSchedule);
+        for(int i = 0; i<locations.length; i++){
+          for(int j = 0; j<locations[i].devices.length; j++){
+            if(device.uid == locations[i].devices[j].uid){
+              locations[i].devices[j].schedules.add(schedule);
+              break;
+            }
+          }
+        }
+        return Future.value(locations);
       }
     );
   }
 
+  bool isScheduleExist(Schedule schedule, Device device){
+    for(int i = 0; i<device.schedules.length; i++){
+      if(schedule.uid == device.schedules[i].uid)
+        return true;
+    }
+    return false;
+  }
+
   @override
-  Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device){
+  Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device){ 
+    if(isScheduleExist(schedule, device)){
+      return addScheduleOnDevice(schedule, device);
+    }
     return getway.updateSchedule(schedule, device).then(
       (newSchedule){
         if (newSchedule == null)
@@ -208,8 +227,22 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  void deleteScheduleOnDevice(Schedule schedule, Device device){
-    getway.deleteSchedule(schedule.uid);
+  Future<List<Location>> deleteScheduleOnDevice(Schedule schedule, Device device){
+    getway.deleteSchedule(schedule.uid)
+      .then((uid){
+        for(int i = 0; i<locations.length; i++){
+          for(int j = 0; j<locations[i].devices.length; j++){
+            if(device.uid != locations[i].devices[j].uid) 
+              continue;
+            for(int k = 0; k<locations[j].devices[j].schedules.length; k++){
+              if(schedule.uid != locations[j].devices[j].schedules[k].uid)
+                continue;
+              locations[j].devices[j].schedules.removeAt(k);
+              return Future.value(locations);
+            }
+          }
+        }
+     });
   }
 
   @override
@@ -244,10 +277,10 @@ class MockLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<Schedule> addScheduleOnDevice(Schedule schedule, Device device){
+  Future<List<Location>> addScheduleOnDevice(Schedule schedule, Device device){
     return getway.addSChedule(schedule, device).then(
       (newSchedule){
-        return Future.value(newSchedule);
+        return Future.value(locations);
       }
     );
   }
@@ -262,8 +295,9 @@ class MockLocationRepository implements LocationRepository{
   }
 
   @override
-  void deleteScheduleOnDevice(Schedule schedule, Device device){
+  Future<List<Location>> deleteScheduleOnDevice(Schedule schedule, Device device){
     getway.deleteSchedule(schedule.uid);
+    return Future.value(locations);
   }
 
   MockLocationRepository(){

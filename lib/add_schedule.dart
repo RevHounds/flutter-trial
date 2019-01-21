@@ -5,25 +5,25 @@ import './data/model/schedule.dart';
 import './data/model/location.dart';
 import './utils/container.dart';
 
-class ScheduleDetailPage extends StatefulWidget{
+class addschedulePage extends StatefulWidget{
   static const String routeName = "/schedule-detail";
   Device device;
-  ScheduleDetailPage(this.device);
+  addschedulePage(this.device);
 
   @override
-  State<ScheduleDetailPage> createState() => new ScheduleDetailPageState(this.device);
+  State<addschedulePage> createState() => new addschedulePageState(this.device);
 
 }
-class ScheduleDetailPageState extends State<ScheduleDetailPage> implements ScheduleDetailPageContract{
+class addschedulePageState extends State<addschedulePage> implements AddSchedulePageContract{
   Device device;
   Schedule schedule;
-  ScheduleDetailPagePresenter presenter;
+  AddSchedulePagePresenter presenter;
   var container;
   List<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   bool isLoading = true;
 
-  ScheduleDetailPageState(this.device);
+  addschedulePageState(this.device);
   
   @override
   void onScheduleSaved(List<Location> locations){

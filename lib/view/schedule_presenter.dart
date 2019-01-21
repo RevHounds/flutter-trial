@@ -7,6 +7,13 @@ import '../data/model/location.dart';
 abstract class ScheduleDetailPageContract{
   void onScheduleSaved(List<Location> locations);
   void onScheduleModified(Schedule newSchedule);
+  void onScheduleDeleted(List<Location> locations);
+}
+
+abstract class AddSchedulePageContract{
+  void onScheduleSaved(List<Location> locations);
+  void onScheduleModified(Schedule newSchedule);
+  void onScheduleDeleted(List<Location> locations);
 }
 
 abstract class CheckBoxTileContract{
@@ -16,7 +23,7 @@ abstract class CheckBoxTileContract{
 
 abstract class DeviceDetailPageContract{
   void onSchedulesLoaded(List<Schedule> schedules);
-  void onScheduleAdded(Schedule schedule);
+  void onScheduleAdded(List<Location> locations);
 }
 
 abstract class ScheduleCardContract{
@@ -44,6 +51,35 @@ class DayButtonPresenter{
   }
 }
 
+class AddSchedulePagePresenter{
+  AddSchedulePageContract _view;
+  LocationRepository _repo;
+
+  AddSchedulePagePresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void modifySchedule(Schedule schedule){
+    _view.onScheduleModified(schedule);
+  }
+
+  void saveSchedule(Schedule schedule, Device device){
+    _repo.updateScheduleOnDevice(schedule, device).then(
+      (locations){
+        _view.onScheduleSaved(locations);
+      }
+    );
+  }
+
+  void deleteSchedule(Schedule schedule, Device device){
+    _repo.deleteScheduleOnDevice(schedule, device).
+      then((locations){
+        _view.onScheduleDeleted(locations);
+      });
+  }
+}
+
+
 class ScheduleDetailPagePresenter{
   ScheduleDetailPageContract _view;
   LocationRepository _repo;
@@ -62,6 +98,13 @@ class ScheduleDetailPagePresenter{
         _view.onScheduleSaved(locations);
       }
     );
+  }
+
+  void deleteSchedule(Schedule schedule, Device device){
+    _repo.deleteScheduleOnDevice(schedule, device).
+      then((locations){
+        _view.onScheduleDeleted(locations);
+      });
   }
 }
 
@@ -132,8 +175,8 @@ class DeviceDetailPagePresenter{
 
   void addSchedule(Device device){
     _repo.addScheduleOnDevice(new Schedule(), device).then(
-      (schedule){
-        this._view.onScheduleAdded(schedule);
+      (locations){
+        this._view.onScheduleAdded(locations);
       }
     );
   }
