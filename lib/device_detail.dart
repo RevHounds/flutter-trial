@@ -5,6 +5,7 @@ import 'data/model/device.dart';
 import 'data/model/schedule.dart';
 import 'data/model/location.dart';
 import 'schedule_detail.dart';
+import 'add_schedule.dart';
 
 class DeviceDetailPage extends StatefulWidget{
   static const String routeName = "/device-detail";
@@ -66,7 +67,7 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
     Navigator.of(context).push(
       new MaterialPageRoute(
         builder: (context){
-          return new ScheduleDetailPage(this.device);
+          return new AddSchedulePage(this.device);
         }
       )
     );

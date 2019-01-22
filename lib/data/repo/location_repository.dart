@@ -176,11 +176,13 @@ class ProLocationRepository implements LocationRepository{
   Future<List<Location>> addScheduleOnDevice(Schedule schedule, Device device){
     return getway.addSChedule(schedule, device).then(
       (newSchedule){
+        device.schedules.add(schedule);
+      
         for(int i = 0; i<locations.length; i++){
           for(int j = 0; j<locations[i].devices.length; j++){
             if(device.uid == locations[i].devices[j].uid){
-              locations[i].devices[j].schedules.add(schedule);
-              break;
+              locations[i].devices[j] = device;
+              return locations;
             }
           }
         }

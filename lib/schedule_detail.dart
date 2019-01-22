@@ -112,7 +112,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
       ),
       body: new ListView(
         children: <Widget>[
-          new TimeCards("Start", this.schedule.start),
+          new TimeCards("Start", this.schedule.start, this.schedule),
           new ListTile(
             contentPadding: new EdgeInsets.all(0.0),
             leading: new Checkbox(
@@ -120,7 +120,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
             ),
             title: new Text("Ranged schedule"),
           ),
-          new TimeCards("End", this.schedule.end),
+          new TimeCards("End", this.schedule.end, this.schedule),
           new Card(
             child: new Padding(
               padding: new EdgeInsets.only(top: 10.0, left: 10.0, bottom: 10.0),

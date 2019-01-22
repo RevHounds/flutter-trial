@@ -14,8 +14,8 @@ class AddSchedulePage extends StatefulWidget{
 
   @override
   State<AddSchedulePage> createState() => new AddSchedulePageState(this.device);
-
 }
+
 class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedulePageContract{
   Device device;
   Schedule schedule;
@@ -25,62 +25,29 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
 
   bool isLoading = true;
 
-  AddSchedulePageState(this.device);
+  AddSchedulePageState(this.device){
+    presenter = new AddSchedulePagePresenter(this);
+  }
   
   @override
   void onScheduleSaved(List<Location> locations){
     container.locations = locations;
-    setState(() {      
-    }); 
+    print("Sudah tersimpan dengan baik");
+    Navigator.of(context).pop();
   }
 
   @override
   void onScheduleModified(Schedule schedule){
+    container.onFocusSchedule = schedule;
     this.schedule = schedule;
+    setState(() {
+    });
   }
 
   @override
   void onScheduleDeleted(List<Location> locations){
     container.locations = locations;
     Navigator.of(context).pop();
-  }
-
-  Future<Null> popUpDeleteSchedule() async {
-    return showDialog<Null>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text('Delete Schedule'),
-          content: new SingleChildScrollView(
-            child: new ListBody(
-              children: <Widget>[
-                new Text("Are you sure you wanted to delete this schedule?")
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton( 
-              child: new Text("Delete"),
-              onPressed: () {
-                presenter.deleteSchedule(this.schedule, this.device);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deleteSchedule(){
-    popUpDeleteSchedule();
   }
 
   void getSchedule(){
@@ -103,24 +70,20 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(this.device.name + '\'s Schedule'),
-        actions: <Widget>[
-          new IconButton(
-            icon: new Icon(Icons.delete),
-            onPressed: _deleteSchedule,
-          )
-        ],
       ),
       body: new ListView(
         children: <Widget>[
-          new TimeCards("Start", this.schedule.start),
+          new TimeCards("Start", this.schedule.start, this.schedule),
           new ListTile(
-            contentPadding: new EdgeInsets.all(0.0),
+            title: const Text("Ranged Schedule"),
             leading: new Checkbox(
-              value: false,
+              value: schedule.isRanged,
+              onChanged: (bool value){
+                presenter.changeIsRanged(schedule);
+              },
             ),
-            title: new Text("Ranged schedule"),
           ),
-          new TimeCards("End", this.schedule.end),
+          new TimeCards("End", this.schedule.end, this.schedule),
           new Card(
             child: new Padding(
               padding: new EdgeInsets.only(top: 10.0, left: 10.0, bottom: 10.0),
@@ -163,9 +126,7 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
                 color: Colors.white,
                 height: 40,
                 minWidth: 120.0,
-                onPressed: (){
-                  _cancelModify();
-                },
+                onPressed: _cancelModify
               ),
               new MaterialButton(
                 child: new Text(

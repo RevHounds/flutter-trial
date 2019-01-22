@@ -286,6 +286,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
               new ListTile(
                 leading: new Icon(Icons.lightbulb_outline),
                 title: new Text(devices[index].name),
+                subtitle: new Text(devices[index].description),
                 trailing: new Switch(
                   value: devices[index].status,
                   onChanged: (value){
@@ -293,7 +294,6 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
                     presenter.changeState(location, devices[index]);
                   },
                 ),
-                subtitle: new Text(devices[index].description),
               ),
           ),
         )

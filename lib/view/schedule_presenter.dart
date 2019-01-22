@@ -34,6 +34,10 @@ abstract class DayButtonContract{
   void onRepeatPressed(bool value);
 }
 
+abstract class TimeCardContract{
+  void onTimeChanged(String time, Schedule schedule);
+}
+
 class DayButtonPresenter{
   DayButtonContract _view;
   LocationRepository _repo;
@@ -63,8 +67,14 @@ class AddSchedulePagePresenter{
     _view.onScheduleModified(schedule);
   }
 
+
+  void changeIsRanged(Schedule schedule){
+    schedule.isRanged = !schedule.isRanged;
+    _view.onScheduleModified(schedule);
+  }
+
   void saveSchedule(Schedule schedule, Device device){
-    _repo.updateScheduleOnDevice(schedule, device).then(
+    _repo.addScheduleOnDevice(schedule, device).then(
       (locations){
         _view.onScheduleSaved(locations);
       }
@@ -79,6 +89,25 @@ class AddSchedulePagePresenter{
   }
 }
 
+class TimeCardPresenter{
+  TimeCardContract _view;
+  LocationRepository _repo;
+
+  TimeCardPresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void changeTime(String determiner, String time, Schedule schedule){
+    determiner = determiner.toLowerCase();
+    if(determiner == "start"){
+      schedule.start = time;
+    } else{
+      schedule.end = time;
+    }
+
+    _view.onTimeChanged(time, schedule);
+  }
+}
 
 class ScheduleDetailPagePresenter{
   ScheduleDetailPageContract _view;
