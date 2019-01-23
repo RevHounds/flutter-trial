@@ -28,8 +28,9 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
   ScheduleDetailPageState(this.device);
   
   @override
-  void onScheduleSaved(List<Location> locations){
+  void onScheduleSaved(List<Location> locations, Device device){
     container.locations = locations;
+    container.onFocusDevice = device;
     setState(() {      
     }); 
   }

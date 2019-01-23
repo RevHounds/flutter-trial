@@ -47,8 +47,12 @@ class Schedule{
 
   Schedule.fromMap(Map<String, dynamic> map){
     repeatDay = new Map<String, bool>();
+    
     this.uid = map["Id"];
     this.start = map["Start"];
+    this.end = map["End"];
+    this.isRanged = map["IsRanged"].toString().toLowerCase() == "false" ? false : true;
+
     if (map["Command"].toString().toLowerCase() == "on"){
       this._command = true;
     } else {

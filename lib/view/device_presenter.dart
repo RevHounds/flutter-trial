@@ -20,7 +20,5 @@ class AddDevicePresenter{
         .then((locations){
           _view.onAddDevice(locations);
         });
-
     }
-
 }

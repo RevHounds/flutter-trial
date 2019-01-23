@@ -5,13 +5,13 @@ import '../utils/injector.dart';
 import '../data/model/location.dart';
 
 abstract class ScheduleDetailPageContract{
-  void onScheduleSaved(List<Location> locations);
+  void onScheduleSaved(List<Location> locations, Device device);
   void onScheduleModified(Schedule newSchedule);
   void onScheduleDeleted(List<Location> locations);
 }
 
 abstract class AddSchedulePageContract{
-  void onScheduleSaved(List<Location> locations);
+  void onScheduleSaved(List<Location> locations, Device device);
   void onScheduleModified(Schedule newSchedule);
   void onScheduleDeleted(List<Location> locations);
 }
@@ -76,7 +76,7 @@ class AddSchedulePagePresenter{
   void saveSchedule(Schedule schedule, Device device){
     _repo.addScheduleOnDevice(schedule, device).then(
       (locations){
-        _view.onScheduleSaved(locations);
+        _view.onScheduleSaved(locations, device);
       }
     );
   }
@@ -124,7 +124,7 @@ class ScheduleDetailPagePresenter{
   void saveSchedule(Schedule schedule, Device device){
     _repo.updateScheduleOnDevice(schedule, device).then(
       (locations){
-        _view.onScheduleSaved(locations);
+        _view.onScheduleSaved(locations, device);
       }
     );
   }

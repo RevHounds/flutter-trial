@@ -276,6 +276,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
               Navigator.of(context).push(
                 new MaterialPageRoute(
                   builder: (context){
+                    container.onFocusDevice = devices[index];
                     print(devices[index].name);
                     return new DeviceDetailPage(devices[index]);
                   }

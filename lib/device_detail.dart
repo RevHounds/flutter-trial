@@ -35,7 +35,7 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   @override
   void onSchedulesLoaded(List<Schedule> newSchedules){
     setState(() {
-      this.schedules = newSchedules;      
+      this.schedules = newSchedules;
     });
   }
 
@@ -116,7 +116,6 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
-
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(device.name + ' Detail'),

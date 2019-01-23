@@ -30,8 +30,9 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
   }
   
   @override
-  void onScheduleSaved(List<Location> locations){
+  void onScheduleSaved(List<Location> locations, Device device){
     container.locations = locations;
+    container.onFocusDevice = device;
     print("Sudah tersimpan dengan baik");
     Navigator.of(context).pop();
   }

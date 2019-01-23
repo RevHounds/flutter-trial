@@ -374,6 +374,8 @@ class RestGetway{
     return NetworkUtils().post(addScheduleUrl, body: {
       "id" : schedule.uid,
       "start" : schedule.start,
+      "end" : schedule.end,
+      "isranged" : schedule.isRanged.toString(),
       "command" : schedule.command,
       "status" : schedule.status.toString(),
       "days" : schedule.repeatString,

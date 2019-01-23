@@ -56,6 +56,7 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
       newDevice = new Device(name: nameController.text, description: descController.text, port: int.parse(portController.text));
     else
       newDevice = new Device(name: nameController.text, port: int.parse(portController.text));
+
     presenter.saveDeviceOnLocation(newDevice, location);
   }
 
