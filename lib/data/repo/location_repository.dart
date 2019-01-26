@@ -191,19 +191,8 @@ class ProLocationRepository implements LocationRepository{
     );
   }
 
-  bool isScheduleExist(Schedule schedule, Device device){
-    for(int i = 0; i<device.schedules.length; i++){
-      if(schedule.uid == device.schedules[i].uid)
-        return true;
-    }
-    return false;
-  }
-
   @override
   Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device){ 
-    if(isScheduleExist(schedule, device)){
-      return addScheduleOnDevice(schedule, device);
-    }
     return getway.updateSchedule(schedule, device).then(
       (newSchedule){
         if (newSchedule == null)

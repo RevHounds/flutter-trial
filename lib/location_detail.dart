@@ -278,7 +278,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
                   builder: (context){
                     container.onFocusDevice = devices[index];
                     print(devices[index].name);
-                    return new DeviceDetailPage(devices[index]);
+                    return new DeviceDetailPage();
                   }
                 )
               );

@@ -76,7 +76,14 @@ class AddSchedulePagePresenter{
   void saveSchedule(Schedule schedule, Device device){
     _repo.addScheduleOnDevice(schedule, device).then(
       (locations){
-        _view.onScheduleSaved(locations, device);
+        Device newDevice;
+        for(int i = 0; i<locations.length; i++){
+          for(int j = 0; j<locations[i].devices.length; j++){
+            if(device.uid == locations[i].devices[j].uid)
+              newDevice = locations[i].devices[j];
+          }
+        }
+        _view.onScheduleSaved(locations, newDevice);
       }
     );
   }

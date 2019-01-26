@@ -9,11 +9,10 @@ import './widgets/time_cards.dart';
 
 class ScheduleDetailPage extends StatefulWidget{
   static const String routeName = "/schedule-detail";
-  Device device;
-  ScheduleDetailPage(this.device);
+  ScheduleDetailPage();
 
   @override
-  State<ScheduleDetailPage> createState() => new ScheduleDetailPageState(this.device);
+  State<ScheduleDetailPage> createState() => new ScheduleDetailPageState();
 
 }
 class ScheduleDetailPageState extends State<ScheduleDetailPage> implements ScheduleDetailPageContract{
@@ -25,7 +24,9 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
 
   bool isLoading = true;
 
-  ScheduleDetailPageState(this.device);
+  ScheduleDetailPageState(){
+    this.presenter = new ScheduleDetailPagePresenter(this);
+  }
   
   @override
   void onScheduleSaved(List<Location> locations, Device device){
@@ -84,11 +85,6 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
     popUpDeleteSchedule();
   }
 
-  void getSchedule(){
-    this.schedule = container.onFocusSchedule;
-    setState(() {});
-  }
-
   void _cancelModify(){
     Navigator.of(context).pop();
   }
@@ -96,11 +92,9 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
+    this.device = container.onFocusDevice;
+    this.schedule = container.onFocusSchedule;
     
-    if(this.schedule == null){
-      getSchedule();
-    }
-
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(this.device.name + '\'s Schedule'),

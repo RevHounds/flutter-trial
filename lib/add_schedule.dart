@@ -9,11 +9,10 @@ import './widgets/time_cards.dart';
 
 class AddSchedulePage extends StatefulWidget{
   static const String routeName = "/schedule-detail";
-  Device device;
-  AddSchedulePage(this.device);
+  AddSchedulePage();
 
   @override
-  State<AddSchedulePage> createState() => new AddSchedulePageState(this.device);
+  State<AddSchedulePage> createState() => new AddSchedulePageState();
 }
 
 class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedulePageContract{
@@ -25,14 +24,18 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
 
   bool isLoading = true;
 
-  AddSchedulePageState(this.device){
+  AddSchedulePageState(){
     presenter = new AddSchedulePagePresenter(this);
   }
   
   @override
-  void onScheduleSaved(List<Location> locations, Device device){
+  void onScheduleSaved(List<Location> locations, Device newDevice){
     container.locations = locations;
-    container.onFocusDevice = device;
+    container.onFocusDevice = newDevice;
+
+    print("this device: " + this.device.schedules.length.toString());
+    print("new Device: " + newDevice.schedules.length.toString());
+
     print("Sudah tersimpan dengan baik");
     Navigator.of(context).pop();
   }
@@ -63,7 +66,8 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
-    
+    this.device = container.onFocusDevice;
+
     if(this.schedule == null){
       getSchedule();
     }

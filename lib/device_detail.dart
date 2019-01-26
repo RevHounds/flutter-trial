@@ -9,14 +9,11 @@ import 'add_schedule.dart';
 
 class DeviceDetailPage extends StatefulWidget{
   static const String routeName = "/device-detail";
-  Device device; 
 
-  DeviceDetailPage(this.device){
-    print("loaded device detail page, loading " + device.name);
-  }
+  DeviceDetailPage();
 
   @override
-  State<DeviceDetailPage> createState() => new DeviceDetailPageState(this.device);
+  State<DeviceDetailPage> createState() => new DeviceDetailPageState();
 }
 
 class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDetailPageContract{
@@ -26,10 +23,9 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   ListView scheduleView = new ListView();
   DeviceDetailPagePresenter presenter;
 
-  DeviceDetailPageState(this.device){
+  DeviceDetailPageState(){
     schedules = new List<Schedule>();
     presenter = new DeviceDetailPagePresenter(this);
-    presenter.loadSchedules(device);
   }
 
   @override
@@ -64,10 +60,12 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   void _addSchedule(){
     Schedule newSchedule = new Schedule();
     container.onFocusSchedule = newSchedule;
+    this.device = container.onFocusDevice;
+
     Navigator.of(context).push(
       new MaterialPageRoute(
         builder: (context){
-          return new AddSchedulePage(this.device);
+          return new AddSchedulePage();
         }
       )
     );
@@ -116,6 +114,10 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
+    this.device = container.onFocusDevice;
+
+    presenter.loadSchedules(this.device);
+
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(device.name + ' Detail'),
@@ -189,8 +191,9 @@ class ScheduleCardState extends State<ScheduleCard> implements ScheduleCardContr
           Navigator.of(context).push(
             new MaterialPageRoute(
               builder: (context){
-                container.onFocusSchedule = schedule;
-                return new ScheduleDetailPage(device);
+                container.onFocusSchedule = this.schedule;
+                container.onFocusDevice = this.device;
+                return new ScheduleDetailPage();
               }
             )
           );
