@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'view/schedule_presenter.dart';
+import 'widgets/loading_screen.dart';
 import 'utils/container.dart';
 import 'data/model/device.dart';
 import 'data/model/schedule.dart';
@@ -9,8 +10,6 @@ import 'add_schedule.dart';
 
 class DeviceDetailPage extends StatefulWidget{
   static const String routeName = "/device-detail";
-
-  DeviceDetailPage();
 
   @override
   State<DeviceDetailPage> createState() => new DeviceDetailPageState();
@@ -22,16 +21,24 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   List<Schedule> schedules;
   ListView scheduleView = new ListView();
   DeviceDetailPagePresenter presenter;
+  bool isSearching;
 
   DeviceDetailPageState(){
-    schedules = new List<Schedule>();
     presenter = new DeviceDetailPagePresenter(this);
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    isSearching = true;
   }
 
   @override
   void onSchedulesLoaded(List<Schedule> newSchedules){
     setState(() {
-      this.schedules = newSchedules;
+      device.schedules = newSchedules;
+      container.onFocusDevice = device;
+      this.isSearching = false;
     });
   }
 
@@ -41,11 +48,6 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
     setState(() {
     });
   }
-
-  @override
-  void initState() {
-      super.initState();
-    }
 
   List<Widget> _generateScheduleList(List<Schedule> schedules){
     List<ScheduleCard> cards = new List<ScheduleCard>();
@@ -114,9 +116,21 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
-    this.device = container.onFocusDevice;
 
-    presenter.loadSchedules(this.device);
+    this.device = container.onFocusDevice; 
+    this.schedules = device.schedules;
+
+    var body;
+
+    if(isSearching){
+      body = new LoadingScreen();
+      presenter.loadSchedules(this.device);
+    } else{
+      body = new ListView(
+        children: _generateScheduleList(schedules)
+      );
+    }
+
 
     return new Scaffold(
       appBar: new AppBar(
@@ -128,9 +142,7 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
             )
         ],
       ),
-      body: new ListView(
-        children: _generateScheduleList(schedules)
-      ),
+      body: body,
       floatingActionButton: new FloatingActionButton(
         child: new Icon(Icons.add),
         onPressed: _addSchedule

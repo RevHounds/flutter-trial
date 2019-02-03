@@ -149,6 +149,21 @@ class Schedule{
         repeatDay["Saturday"]  == false &&
         repeatDay["Sunday"]    == false )
         repeatDay["None"] = true;
+
+    if(repeatDay["None"]){
+      repeatString =  "None";
+      return;
+    }
+    
+    String res = "";
+    if(repeatDay["Monday"]) res += "Monday ";
+    if(repeatDay["Tuesday"]) res += "Tuesday ";
+    if(repeatDay["Wednesday"]) res += "Wednesday ";
+    if(repeatDay["Thursday"]) res += "Thursday ";
+    if(repeatDay["Friday"]) res += "Friday ";
+    if(repeatDay["Saturday"]) res += "Saturday ";
+    if(repeatDay["Sunday"]) res += "Sunday";
+    repeatString = res;
   }
 
   set repeat(String req){

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/model/schedule.dart';
 import '../view/schedule_presenter.dart';
+import '../utils/container.dart';
 
 class DayButton extends StatefulWidget{
   final String day;
@@ -17,6 +18,7 @@ class DayButtonState extends State<DayButton> implements DayButtonContract{
   bool currentState;
   Schedule schedule;
   DayButtonPresenter presenter;
+  var container;
 
   DayButtonState(this.day, this.schedule){
     shortDay = day.substring(0,2);
@@ -25,15 +27,19 @@ class DayButtonState extends State<DayButton> implements DayButtonContract{
   }
 
   @override
-  void onRepeatPressed(bool value){
-    this.currentState = value;      
-    schedule.repeatDay[day] = value;
+  void onRepeatPressed(Schedule newSchedule){
+    print(newSchedule.repeatString);
+    this.currentState = newSchedule.repeatDay[day];
+    container.onFocusSchedule = newSchedule;
     setState(() {
     });
   }
 
   @override
   Widget build(BuildContext context){
+    container = StateContainer.of(context);
+    this.schedule = container.onFocusSchedule;
+
     return new FlatButton(
       color: currentState ? Colors.blue : Colors.white,
       child: new Text(

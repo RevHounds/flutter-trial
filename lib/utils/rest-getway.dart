@@ -370,6 +370,7 @@ class RestGetway{
     print(_authenticationKey);
     print("Schedule UID: " + schedule.uid);
     print("Device UID: " + device.uid);
+    print("Schedule Repeats: " + schedule.repeatString);
   
     return NetworkUtils().post(addScheduleUrl, body: {
       "id" : schedule.uid,

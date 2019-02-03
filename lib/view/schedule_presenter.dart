@@ -31,7 +31,7 @@ abstract class ScheduleCardContract{
 }
 
 abstract class DayButtonContract{
-  void onRepeatPressed(bool value);
+  void onRepeatPressed(Schedule newSchedule);
 }
 
 abstract class TimeCardContract{
@@ -48,8 +48,8 @@ class DayButtonPresenter{
 
   void selectDay(String day, Schedule schedule){
     _repo.changeRepeatOnSchedule(day, schedule).then(
-      (value){
-        _view.onRepeatPressed(value);
+      (newSchedule){
+        _view.onRepeatPressed(newSchedule);
       }
     );
   }

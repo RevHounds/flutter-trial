@@ -41,9 +41,9 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
   }
 
   @override
-  void onScheduleModified(Schedule schedule){
-    container.onFocusSchedule = schedule;
-    this.schedule = schedule;
+  void onScheduleModified(Schedule newSchedule){
+    container.onFocusSchedule = newSchedule;
+    this.schedule = newSchedule;
     setState(() {
     });
   }
@@ -54,11 +54,6 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
     Navigator.of(context).pop();
   }
 
-  void getSchedule(){
-    this.schedule = container.onFocusSchedule;
-    setState(() {});
-  }
-
   void _cancelModify(){
     Navigator.of(context).pop();
   }
@@ -67,10 +62,9 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
   Widget build(BuildContext context){
     container = StateContainer.of(context);
     this.device = container.onFocusDevice;
-
-    if(this.schedule == null){
-      getSchedule();
-    }
+    this.schedule = container.onFocusSchedule;
+    
+    print(schedule.repeat);
 
     return new Scaffold(
       appBar: new AppBar(

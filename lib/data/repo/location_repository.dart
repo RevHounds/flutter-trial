@@ -33,7 +33,7 @@ abstract class LocationRepository{
   Future<List<Location>> addScheduleOnDevice(Schedule schedule, Device device);
   Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device);
   Future<List<Location>> deleteScheduleOnDevice(Schedule schedule, Device device);
-  Future<bool> changeRepeatOnSchedule(String day, Schedule schedule);
+  Future<Schedule> changeRepeatOnSchedule(String day, Schedule schedule);
 }
 
 class ProLocationRepository implements LocationRepository{
@@ -103,10 +103,10 @@ class ProLocationRepository implements LocationRepository{
   Future<List<Location>> addDeviceOnLocation(Device device, Location location){
     print("adding this " + device.name);
       return getway.addDevice(device, location).then(
-        (device){
+        (newDevice){
           for(int i = 0; i<locations.length; i++){
             if(locations[i].uid == location.uid){
-              locations[i].devices.add(device);
+              locations[i].devices.add(newDevice);
             }
           }
           return Future.value(locations);
@@ -237,8 +237,12 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<bool> changeRepeatOnSchedule(String day, Schedule schedule){
-    return Future.value(!schedule.repeatDay[day]);
+  Future<Schedule> changeRepeatOnSchedule(String day, Schedule schedule){
+    Schedule temp = schedule;
+    temp.changeValue(day, !temp.repeatDay[day]);
+    print(temp.repeat);
+    schedule = temp;
+    return Future.value(schedule);
   }
 }
 
@@ -358,7 +362,7 @@ class MockLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<bool> changeRepeatOnSchedule(String day, Schedule schedule){
-    return Future.value(!schedule.repeatDay[day]);
+  Future<Schedule> changeRepeatOnSchedule(String day, Schedule schedule){
+    return Future.value(schedule);
   }
 }
