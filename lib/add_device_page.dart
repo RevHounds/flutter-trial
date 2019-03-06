@@ -15,6 +15,7 @@ class AddDevicePage extends StatefulWidget{
 class AddDevicePageContainerState extends State<AddDevicePage> implements AddDevicePageContract{
   var container;
   Location location;
+  String deviceType = "";
 
   final nameController = TextEditingController();
   final descController = TextEditingController();
@@ -51,13 +52,24 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
       return;
     }
 
+    if(deviceType == ""){
+      Toaster.create("You have to choose is it input or output!");
+    }
+
     Device newDevice;
     if(descController.text != '')
-      newDevice = new Device(name: nameController.text, description: descController.text, port: int.parse(portController.text));
+      newDevice = new Device(name: nameController.text, description: descController.text, 
+        port: int.parse(portController.text), type: deviceType);
     else
-      newDevice = new Device(name: nameController.text, port: int.parse(portController.text));
+      newDevice = new Device(name: nameController.text, port: int.parse(portController.text), type: deviceType);
 
     presenter.saveDeviceOnLocation(newDevice, location);
+  }
+
+  void _radioValueChanged(String type){
+    setState(() {
+      this.deviceType = type; 
+    });
   }
 
   @override
@@ -75,9 +87,10 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
           )
         ],
       ),
-      body: new Form(
-        child: new ListView(
-          padding: new EdgeInsets.all(8.0),
+      body: new Container(
+        margin: EdgeInsets.all(0.0),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             new ListTile(
               leading: new Icon(Icons.lightbulb_outline),
@@ -101,7 +114,8 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
                     hintText: 'Description'
                   ),
               ),
-            ),new ListTile(
+            ),
+            new ListTile(
               leading: new Icon(Icons.lightbulb_outline),
               title: new TextField(
                 controller: portController,
@@ -111,7 +125,50 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
                     hintText: 'Port Number'
                   ),
               ),
-            )
+            ),
+            new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new FlatButton(
+                  child: new Row(
+                    children: <Widget>[
+                      new Radio(
+                        value: this.deviceType == "input",
+                        groupValue: true,
+                        onChanged: (bool val){_radioValueChanged("input");},
+                      ),
+                      new Text(
+                        "Input",
+                        style: new TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.black54
+                        ),
+                      ),
+                    ],
+                  ),
+                  onPressed: (){_radioValueChanged("input");},
+                ),
+                new FlatButton(
+                  child: new Row(
+                    children: <Widget>[
+                      new Radio(
+                        value: this.deviceType == "output",
+                        groupValue: true,
+                        onChanged: (bool val){_radioValueChanged("output");},
+                      ),
+                      new Text(
+                        "Output",
+                        style: new TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.black54
+                        ),
+                      ),
+                    ],
+                  ),
+                  onPressed: (){_radioValueChanged("output");},
+                )
+              ],
+            ) 
           ],
         ),
       ),

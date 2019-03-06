@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'utils/container.dart';
 import 'login.dart';
+import 'add_device_page.dart';
 
 class Myapp extends StatelessWidget{
   var container;

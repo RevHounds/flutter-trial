@@ -266,9 +266,10 @@ class RestGetway{
       "id" : device.uid,
       "name" : device.name,
       "port" : device.port,
+      "type" : device.type,
+      "icon" : device.icon,
       "status" : device.status,
       "description" : device.description,
-      "icon" : device.icon,
       "locationid" : location.uid,
     },  
       headers: {

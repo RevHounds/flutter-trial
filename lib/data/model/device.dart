@@ -2,12 +2,13 @@ import '../../utils/uid.dart';
 import 'schedule.dart';
 
 class Device{
+  int port;
+  bool status;
   String uid;
   String name;
-  bool status;
   String icon;
+  String type;
   String description;
-  int port;
   List<Schedule> schedules;
 
   Device({
@@ -16,6 +17,7 @@ class Device{
     this.status = false,
     this.description = "None",
     this.port = 1,
+    this.type = "",
   }) :  this.uid = new IDGenerator().generateUID(),
         this.schedules = new List<Schedule>();
 
@@ -27,5 +29,6 @@ class Device{
     this.description = map["Description"];
     this.port = map["Port"];
     this.schedules = new List<Schedule>();
+    this.type = map["Type"];
   }
 }
