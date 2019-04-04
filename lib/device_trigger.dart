@@ -3,28 +3,28 @@ import 'view/schedule_presenter.dart';
 import 'widgets/loading_screen.dart';
 import 'utils/container.dart';
 import 'data/model/device.dart';
-import 'data/model/schedule.dart';
+import 'add_trigger.dart';
 import 'data/model/location.dart';
-import './widgets/schedule_card.dart';
-import 'add_schedule.dart';
+import 'data/model/trigger.dart';
+import './widgets/trigger_card.dart';
 
-class DeviceDetailPage extends StatefulWidget{
-  static const String routeName = "/device-detail";
+class DeviceTriggerPage extends StatefulWidget{
+  static const String routeName = "/device-trigger";
 
   @override
-  State<DeviceDetailPage> createState() => new DeviceDetailPageState();
+  State<DeviceTriggerPage> createState() => new DeviceTriggerPageState();
 }
 
-class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDetailPageContract{
+class DeviceTriggerPageState extends State<DeviceTriggerPage> implements DeviceTriggerPageContract{
   var container;
   Device device;
-  List<Schedule> schedules;
-  ListView scheduleView = new ListView();
-  DeviceDetailPagePresenter presenter;
+  List<Trigger> triggers;
+  ListView triggerView = new ListView();
+  DeviceTriggerPagePresenter presenter;
   bool isSearching;
 
-  DeviceDetailPageState(){
-    presenter = new DeviceDetailPagePresenter(this);
+  DeviceTriggerPageState(){
+    presenter = new DeviceTriggerPagePresenter(this);
   }
 
   @override
@@ -34,48 +34,46 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   }
 
   @override
-  void onSchedulesLoaded(List<Schedule> newSchedules){
+  void onTriggersLoaded(List<Trigger> newTrigger){
     setState(() {
-      device.schedules = newSchedules;
+      device.triggers = newTrigger;
       container.onFocusDevice = device;
       this.isSearching = false;
     });
   }
 
   @override
-  void onScheduleAdded(List<Location> locations){
+  void onTriggerAdded(List<Location> locations){
     container.locataions = locations;
     setState(() {
     });
   }
 
-  List<Widget> _generateScheduleList(List<Schedule> schedules){
-    List<ScheduleCard> cards = new List<ScheduleCard>();
+  List<Widget> _generateTriggerList(List<Trigger> triggers){
+    List<TriggerCard> cards = new List<TriggerCard>();
 
-    for(Schedule schedule in schedules){
-      cards.add(new ScheduleCard(schedule, device));
+    for(Trigger trigger in triggers){
+      cards.add(new TriggerCard(trigger, device));
     }
 
     return cards;
   }
 
-  void _addSchedule(){
-    Schedule newSchedule = new Schedule();
-    container.onFocusSchedule = newSchedule;
+  void _addTriggers(){
+    Trigger newTrigger = new Trigger(locationId: device.locationId,
+                                     inputPort: device.port,
+                                     outputPort: -1);
+
+    container.onFocusTrigger = newTrigger;
     this.device = container.onFocusDevice;
 
     Navigator.of(context).push(
       new MaterialPageRoute(
         builder: (context){
-          return new AddSchedulePage();
+          return new AddTriggerPage();
         }
       )
     );
-  }
-
-  void _deleteDevice(){
-    print("deleting device");
-    popUpDeleteDevice();
   }
 
   Future<Null> popUpDeleteDevice() async {
@@ -112,25 +110,30 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
       },
     );
   }
+
+  
+  void _deleteDevice(){
+    print("deleting device");
+    popUpDeleteDevice();
+  }
   
   @override
   Widget build(BuildContext context){
     container = StateContainer.of(context);
 
     this.device = container.onFocusDevice; 
-    this.schedules = device.schedules;
+    this.triggers = device.triggers;
 
     var body;
 
     if(isSearching){
       body = new LoadingScreen();
-      presenter.loadSchedules(this.device);
+      presenter.loadTriggers(this.device);
     } else{
       body = new ListView(
-        children: _generateScheduleList(schedules)
+        children: _generateTriggerList(triggers)
       );
     }
-
 
     return new Scaffold(
       appBar: new AppBar(
@@ -145,8 +148,9 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
       body: body,
       floatingActionButton: new FloatingActionButton(
         child: new Icon(Icons.add),
-        onPressed: _addSchedule
+        onPressed: _addTriggers
       ),
     );
   }
 }
+

@@ -1,4 +1,5 @@
 import '../../utils/uid.dart';
+import 'trigger.dart';
 import 'schedule.dart';
 
 class Device{
@@ -10,8 +11,11 @@ class Device{
   String type;
   String description;
   List<Schedule> schedules;
+  List<Trigger> triggers;
+  String locationId;
 
   Device({
+    this.locationId = "",
     this.name,
     this.icon = "lightbulb_outline",
     this.status = false,
@@ -19,16 +23,19 @@ class Device{
     this.port = 1,
     this.type = "",
   }) :  this.uid = new IDGenerator().generateUID(),
-        this.schedules = new List<Schedule>();
+        this.schedules = new List<Schedule>(),
+        this.triggers = new List<Trigger>();
 
   Device.fromMap(Map<String, dynamic> map){
+    this.uid = map["LocationId"];
     this.uid = map["Id"];
     this.name = map["Name"];
     this.status = map["Status"];
     this.icon = map["Icon"];
     this.description = map["Description"];
     this.port = map["Port"];
-    this.schedules = new List<Schedule>();
     this.type = map["Type"];
+    this.schedules = new List<Schedule>();
+    this.triggers = new List<Trigger>();
   }
 }

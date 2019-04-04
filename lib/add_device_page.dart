@@ -61,7 +61,10 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
       newDevice = new Device(name: nameController.text, description: descController.text, 
         port: int.parse(portController.text), type: deviceType);
     else
-      newDevice = new Device(name: nameController.text, port: int.parse(portController.text), type: deviceType);
+      newDevice = new Device(name: nameController.text,
+                             port: int.parse(portController.text), 
+                             type: deviceType,
+                             locationId: location.uid);
 
     presenter.saveDeviceOnLocation(newDevice, location);
   }
@@ -118,6 +121,7 @@ class AddDevicePageContainerState extends State<AddDevicePage> implements AddDev
             new ListTile(
               leading: new Icon(Icons.lightbulb_outline),
               title: new TextField(
+                keyboardType: TextInputType.number,
                 controller: portController,
                 autocorrect: false,
                 decoration: new InputDecoration(

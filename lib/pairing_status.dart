@@ -71,12 +71,12 @@ class PairingStatusPageState extends State<PairingStatusPage> implements Locatio
         child: new Column(
           children: <Widget>[
             new Padding(
-              child: new Text("You have to press a button which is currently on right now on your raspberry, then click the button below",
+              child: new Text("You have been sent an email verification, open the email and go to the given link to verify you are the one adding the location",
                               textAlign: TextAlign.center),
               padding: new EdgeInsets.fromLTRB(0.0, 250.0, 0.0, 20.0),
             ),
             new RaisedButton(
-              child: new Text("I have pressed the button!"),
+              child: new Text("I have verified!"),
               onPressed: checkPairingStatus,
             )
           ],

@@ -3,11 +3,13 @@ import '../data/model/location.dart';
 import '../data/model/user.dart';
 import '../data/model/schedule.dart';
 import '../data/model/device.dart';
+import '../data/model/trigger.dart';
 
 class StateContainer extends StatefulWidget{
   Location onFocusLocation;
   Schedule onFocusSchedule;
   Device onFocusDevice;
+  Trigger onFocusTrigger;
   List<Location> locations;
   Widget child;
   User user;
@@ -29,6 +31,7 @@ class StateContainerState extends State<StateContainer>{
   List<Location> locations;
   Location onFocusLocation;
   Schedule onFocusSchedule;
+  Trigger onFocusTrigger;
   Device onFocusDevice;
   User user;
   bool errorLogin = false;

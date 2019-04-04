@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'utils/container.dart';
 import 'login.dart';
-import 'add_device_page.dart';
 
 class Myapp extends StatelessWidget{
   var container;
@@ -13,13 +12,6 @@ class Myapp extends StatelessWidget{
     homePage = new LoginPage();
 
     return new MaterialApp(
-      theme: new ThemeData(
-        buttonTheme: new ButtonThemeData(
-          minWidth: 45.0,
-          padding: EdgeInsets.all(0.0),
-          buttonColor: Colors.blue
-        )
-      ),
       builder: (context, child) =>
           MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child),
       title: "Smart Home",

@@ -20,12 +20,14 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
   Schedule schedule;
   AddSchedulePagePresenter presenter;
   var container;
+  List<Widget> components = [];
   List<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   bool isLoading = true;
 
   AddSchedulePageState(){
     presenter = new AddSchedulePagePresenter(this);
+    components = new List();
   }
   
   @override
@@ -45,6 +47,7 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
     container.onFocusSchedule = newSchedule;
     this.schedule = newSchedule;
     setState(() {
+      populateComponents();
     });
   }
 
@@ -58,44 +61,33 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
     Navigator.of(context).pop();
   }
 
-  @override
-  Widget build(BuildContext context){
-    container = StateContainer.of(context);
-    this.device = container.onFocusDevice;
-    this.schedule = container.onFocusSchedule;
-    
-    print(schedule.repeat);
+  void populateComponents(){
+    Widget startTimeCard = new TimeCards("Start", this.schedule.start, this.schedule);
+    Widget endTimeCard = new TimeCards("End", this.schedule.end, this.schedule);
 
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(this.device.name + '\'s Schedule'),
-      ),
-      body: new ListView(
-        children: <Widget>[
-          new TimeCards("Start", this.schedule.start, this.schedule),
-          new ListTile(
-            title: const Text("Ranged Schedule"),
-            leading: new Checkbox(
-              value: schedule.isRanged,
-              onChanged: (bool value){
-                presenter.changeIsRanged(schedule);
-              },
-            ),
-          ),
-          new TimeCards("End", this.schedule.end, this.schedule),
-          new Card(
+    Widget rangedScheduleToggle = new ListTile(
+                      title: const Text("Ranged Schedule"),
+                      leading: new Checkbox(
+                        value: schedule.isRanged,
+                        onChanged: (bool value){
+                          presenter.changeIsRanged(schedule);
+                        },
+                      ),
+                    );
+
+    Widget repeatDayButtons = new Card(
             child: new Padding(
               padding: new EdgeInsets.only(top: 10.0, left: 10.0, bottom: 10.0),
               child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   new Padding(
-                    padding: new EdgeInsets.only(bottom: 15.0),
+                    padding: new EdgeInsets.only(bottom: 5.0),
                     child: new Text(
                       "Repeat",
                       style: new TextStyle(
                         fontSize: 18
-                      )
+                      ),
                     ),
                   ),
                   new ButtonBar(
@@ -107,9 +99,9 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
                 ],
               )
             )
-          ),
-          new Padding(padding: EdgeInsets.all(25),),
-          new Row(
+          );
+
+    Widget confirmationButtons = new Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -143,8 +135,38 @@ class AddSchedulePageState extends State<AddSchedulePage> implements AddSchedule
                 },
               ),
             ],
-          )
-        ],
+          );
+
+    components = new List();
+
+    components.add(startTimeCard);
+    components.add(rangedScheduleToggle);
+
+    if(this.schedule.isRanged){
+      components.add(endTimeCard);
+    }
+
+    components.add(repeatDayButtons);          
+    components.add(new Padding(padding: EdgeInsets.all(25),));
+    components.add(confirmationButtons);
+  }
+
+  @override
+  Widget build(BuildContext context){
+    container = StateContainer.of(context);
+    this.device = container.onFocusDevice;
+    this.schedule = container.onFocusSchedule;
+    
+    print(schedule.isRanged.toString());
+
+    populateComponents();
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text(this.device.name + '\'s Schedule'),
+      ),
+      body: new ListView(
+        children: components
       )
     );
   }

@@ -2,6 +2,7 @@ import '../data/model/location.dart';
 import '../data/model/device.dart';
 import '../data/model/user.dart';
 import '../data/model/schedule.dart';
+import '../data/model/trigger.dart';
 import 'dart:async';
 import 'netowrk.dart';
 import 'toast.dart';
@@ -30,6 +31,10 @@ class RestGetway{
   static final addScheduleUrl = baseUrl + "/add-schedule";
   static final updateScheduleUrl = baseUrl + "/update-schedule";
   static final deleteScheduleDeviceUrl = baseUrl + "/delete-device";
+  static final getTriggersUrl = baseUrl + "/get-triggers";
+  static final addTriggerUrl = baseUrl + "/add-trigger";
+  static final updateTriggerUrl = baseUrl + "/update-triggers";
+  static final deleteTriggerUrl = baseUrl + "/delete-trigger";
 
   String _authenticationKey = "";
   String _userId = "";
@@ -439,6 +444,112 @@ class RestGetway{
           print("schedule updated");
           schedule.status = schedule.status;
           return Future.value(schedule);
+        }
+        return Future.value(null);
+      }
+    );
+  }
+
+  Future<List<Trigger>> getTriggers(Device device) async {
+      return NetworkUtils().post(getTriggersUrl,
+          body: {
+            "id" : device.uid
+          },
+          headers: {
+            "authorization" : "Bearer " + _authenticationKey
+          }
+        ).then(
+          (res){
+            List<Trigger> triggers = new List<Trigger>();
+            if(res == null){
+              print("There is no response body");
+              return Future.value(triggers);
+            }
+            
+            if(res["error"] == "true"){
+              print("There is no triggers found yet");
+              return Future.value(triggers);
+            }
+
+            res = res["Triggers"];
+            print(res.toString());
+            
+            for(Map<String, dynamic> trigger in res){
+              Trigger newTrigger= new Trigger.fromMap(trigger);
+              triggers.add(newTrigger);
+            }
+            return Future.value(triggers);
+          }
+        );
+  }
+
+  Future<Trigger> addTrigger(Trigger trigger, Device device){
+    print("Adding new trigger to a device");
+    print(_authenticationKey);
+    print("Schedule UID: " + trigger.uid);
+    print("Device UID: " + device.uid);
+  
+    return NetworkUtils().post(addTriggerUrl, body: {
+      "id" : trigger.uid,
+      "inputport" : trigger.inputPort,
+      "outputport" : trigger.outputPort,
+      "inputcondition" : trigger.inputCondition,
+      "outputcondition" : trigger.outputCondition,
+      "locationid" : trigger.locationId
+    },  
+      headers: {
+        "authorization" : "Bearer " + _authenticationKey
+      }
+    ).then(
+      (res){
+        print(res.toString());
+        if(res["error"] == "false"){
+          
+          return Future.value(trigger);
+        }
+        return Future.value(null);
+      }
+    );
+  }
+
+  Future<String> deleteTrigger(String uid){
+    print(uid);
+    return NetworkUtils().post(deleteTriggerUrl, body: {
+        "id" : uid
+      },
+      headers: {
+        "authorization" : "Bearer " + _authenticationKey
+      }
+    ).then((res){
+      print(res.toString());
+      if(res["error"] == "false")
+        return Future.value(uid);
+      else
+        return Future.value("not found");
+    });
+  }
+
+  Future<Trigger> updateTrigger(Trigger trigger, Device device){
+    print("Updating Schedule in Device");
+    print(_authenticationKey);
+  
+    return NetworkUtils().post(updateTriggerUrl, body: {
+      "id" : trigger.uid,
+      "inputport" : trigger.inputPort,
+      "outputport" : trigger.outputPort,
+      "inputcondition" : trigger.inputCondition,
+      "outputcondition" : trigger.outputCondition,
+      "locationid" : trigger.locationId
+    },  
+      headers: {
+        "authorization" : "Bearer " + _authenticationKey
+      }
+    ).then(
+      (res){
+        print(res.toString());
+        if(res["error"] == "false"){
+          print("schedule updated");
+          return Future.value(trigger);
         }
         return Future.value(null);
       }

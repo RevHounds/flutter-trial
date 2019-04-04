@@ -45,5 +45,5 @@ class LocationView extends Location{
 
 class LocationAddView extends LocationView{
   LocationAddView(String uid, String name)
-    : super(uid, name, "http://www.for-example.org/img/main/forexamplelogo.png");
+    : super(uid, name, "https://i.pinimg.com/originals/a1/97/5f/a1975f8a0f233576745c9758bc85526e.jpg");
 }

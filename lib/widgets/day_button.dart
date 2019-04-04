@@ -39,23 +39,30 @@ class DayButtonState extends State<DayButton> implements DayButtonContract{
   Widget build(BuildContext context){
     container = StateContainer.of(context);
     this.schedule = container.onFocusSchedule;
-
-    return new FlatButton(
-      color: currentState ? Colors.blue : Colors.white,
-      child: new Text(
-        shortDay,
-        style: new TextStyle(
-          fontSize: 18,
-          color: currentState ? Colors.white : Colors.blue
-        )  
-      ),
-      shape: new CircleBorder(),
-      onPressed: (){
-        presenter.selectDay(this.day, this.schedule);
-        setState(() {
-          this.currentState = !this.currentState;          
-        });
-      },
+    
+    return new Container(
+      margin: EdgeInsets.all(0.0),
+      padding: EdgeInsets.all(0.0),
+      width: 30.0,
+      height: 30.0,
+      child: new FlatButton(
+        color: currentState ? Colors.blue : Colors.white,
+        padding: EdgeInsets.all(0.0),
+        child: new Text(
+          shortDay,
+          style: new TextStyle(
+            fontSize: 18,
+            color: currentState ? Colors.white : Colors.blue
+          )  
+        ),
+        shape: new CircleBorder(),
+        onPressed: (){
+          presenter.selectDay(this.day, this.schedule);
+          setState(() {
+            this.currentState = !this.currentState;          
+          });
+        },
+      )
     );
   }
 }

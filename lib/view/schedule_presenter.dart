@@ -1,8 +1,9 @@
 import '../data/model/schedule.dart';
 import '../data/model/device.dart';
 import '../data/repo/location_repository.dart';
-import '../utils/injector.dart';
 import '../data/model/location.dart';
+import '../data/model/trigger.dart';
+import '../utils/injector.dart';
 
 abstract class ScheduleDetailPageContract{
   void onScheduleSaved(List<Location> locations, Device device);
@@ -10,10 +11,22 @@ abstract class ScheduleDetailPageContract{
   void onScheduleDeleted(List<Location> locations);
 }
 
+abstract class TriggerDetailContract{
+  void onTriggerSaved(List<Location> locations, Device device);
+  void onTriggerModified(Trigger newTrigger);
+  void onTriggerDeleted(List<Location> locations);
+}
+
 abstract class AddSchedulePageContract{
   void onScheduleSaved(List<Location> locations, Device device);
   void onScheduleModified(Schedule newSchedule);
   void onScheduleDeleted(List<Location> locations);
+}
+
+abstract class AddTriggerPageContract{
+  void onTriggerSaved(List<Location> locations, Device device);
+  void onTriggerModified(Trigger newTrigger);
+  void onTriggerDeleted(List<Location> locations);
 }
 
 abstract class CheckBoxTileContract{
@@ -26,8 +39,17 @@ abstract class DeviceDetailPageContract{
   void onScheduleAdded(List<Location> locations);
 }
 
+abstract class DeviceTriggerPageContract{
+  void onTriggersLoaded(List<Trigger> triggers);
+  void onTriggerAdded(List<Location> locations);
+}
+
 abstract class ScheduleCardContract{
   void onScheduleUpdated(List<Location> locations);
+}
+
+abstract class TriggerCardContract{
+  void onTriggerUpdated(List<Location> locations);
 }
 
 abstract class DayButtonContract{
@@ -96,6 +118,41 @@ class AddSchedulePagePresenter{
   }
 }
 
+class AddTriggerPagePresenter{
+  AddTriggerPageContract _view;
+  LocationRepository _repo;
+
+  AddTriggerPagePresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void modifySchedule(Trigger trigger){
+    _view.onTriggerModified(trigger);
+  }
+
+  void saveTrigger(Trigger trigger, Device device){
+    _repo.addTriggerOnDevice(trigger, device).then(
+      (locations){
+        Device newDevice;
+        for(int i = 0; i<locations.length; i++){
+          for(int j = 0; j<locations[i].devices.length; j++){
+            if(device.uid == locations[i].devices[j].uid)
+              newDevice = locations[i].devices[j];
+          }
+        }
+        _view.onTriggerSaved(locations, newDevice);
+      }
+    );
+  }
+
+  void deleteTrigger(Trigger trigger, Device device){
+    _repo.deleteTriggerOnDevice(trigger, device).
+      then((locations){
+        _view.onTriggerDeleted(locations);
+      });
+  }
+}
+
 class TimeCardPresenter{
   TimeCardContract _view;
   LocationRepository _repo;
@@ -140,6 +197,34 @@ class ScheduleDetailPagePresenter{
     _repo.deleteScheduleOnDevice(schedule, device).
       then((locations){
         _view.onScheduleDeleted(locations);
+      });
+  }
+}
+
+class TriggerDetailPresenter{
+  TriggerDetailContract _view;
+  LocationRepository _repo;
+
+  TriggerDetailPresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void modifyTrigger(Trigger trigger){
+    _view.onTriggerModified(trigger);
+  }
+
+  void saveTrigger(Trigger trigger, Device device){
+    _repo.updateTriggerOnDevice(trigger, device).then(
+      (locations){
+        _view.onTriggerSaved(locations, device);
+      }
+    );
+  }
+
+  void deleteTrigger(Trigger trigger, Device device){
+    _repo.deleteTriggerOnDevice(trigger, device).
+      then((locations){
+        _view.onTriggerDeleted(locations);
       });
   }
 }
@@ -226,6 +311,35 @@ class DeviceDetailPagePresenter{
   }
 }
 
+class DeviceTriggerPagePresenter{
+  DeviceTriggerPageContract _view;
+  LocationRepository _repo;
+
+  DeviceTriggerPagePresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void deleteDevice(Device device){
+    _repo.deleteDevice(device);
+  }
+
+  void addTrigger(Trigger trigger, Device device){
+    _repo.addTriggerOnDevice(trigger, device).then(
+      (locations){
+        this._view.onTriggerAdded(locations);
+      }
+    );
+  }
+
+  void loadTriggers(Device device){
+    _repo.getTriggers(device).then(
+      (triggers){
+        this._view.onTriggersLoaded(triggers);
+      }
+    );
+  }
+}
+
 class ScheduleCardPresenter{
   ScheduleCardContract _view;
   LocationRepository _repo;
@@ -238,6 +352,23 @@ class ScheduleCardPresenter{
     _repo.updateScheduleOnDevice(newSchedule, device).then(
       (schedule){
         _view.onScheduleUpdated(schedule);
+      }
+    );
+  }
+}
+
+class TriggerCardPresenter{
+  TriggerCardContract _view;
+  LocationRepository _repo;
+
+  TriggerCardPresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void saveTrigger(Trigger newTrigger, Device device){
+    _repo.updateTriggerOnDevice(newTrigger, device).then(
+      (trigger){
+        _view.onTriggerUpdated(trigger);
       }
     );
   }

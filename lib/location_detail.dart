@@ -7,6 +7,7 @@ import 'utils/container.dart';
 import './add_device_page.dart';
 import './widgets/loading_screen.dart';
 import 'device_detail.dart';
+import 'device_trigger.dart';
 
 class LocationDetail extends StatefulWidget{
   static String routeName = '/location_detail';
@@ -265,41 +266,107 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
     );
   }
 
-  List<Widget> buildDeviceList(int length){
-    List<Widget> list = new List<Widget>();
-    for(int index = 0; index<length; index++){
-      list.add(
-        new Card(
-          elevation: 1.5,
-          child: new FlatButton(
-            onPressed: (){
-              Navigator.of(context).push(
-                new MaterialPageRoute(
-                  builder: (context){
-                    container.onFocusDevice = devices[index];
-                    print(devices[index].name);
-                    return new DeviceDetailPage();
-                  }
-                )
-              );
-            },
-            child:
-              new ListTile(
-                leading: new Icon(Icons.lightbulb_outline),
-                title: new Text(devices[index].name),
-                subtitle: new Text(devices[index].description),
-                trailing: new Switch(
-                  value: devices[index].status,
-                  onChanged: (value){
-                    devices[index].status = !devices[index].status;
-                    presenter.changeState(location, devices[index]);
-                  },
-                ),
-              ),
-          ),
-        )
+  Widget buildInputListTile(Device device){
+    ListTile listTile = new ListTile(
+      leading: new Icon(Icons.lightbulb_outline),
+      title: new Text(device.name),
+      subtitle: new Text(device.type),
+      trailing: new Text(
+        (device.status) ? "TRUE" : "FALSE"
+      )
+    );
+
+    Widget card = new Card(
+        elevation: 1.5,
+        child: new FlatButton(
+          onPressed: (){
+            Navigator.of(context).push(
+              new MaterialPageRoute(
+                builder: (context){
+                  container.onFocusDevice = device;
+                  print(device.name);
+                  return new DeviceTriggerPage();
+                }
+              )
+            );
+          },
+          child: listTile
+        ),
+      );
+    return card;
+  }
+
+  Widget buildOutputListTile(Device device){
+    ListTile listTile = new ListTile(
+      leading: new Icon(Icons.lightbulb_outline),
+      title: new Text(device.name),
+      subtitle: new Text(device.type),
+      trailing: new Switch(
+        value: device.status,
+        onChanged: (value){
+          device.status = !device.status;
+          presenter.changeState(location, device);
+        },
+      ),
+    );
+
+    Widget card = new Card(
+        elevation: 1.5,
+        child: new FlatButton(
+          onPressed: (){
+            Navigator.of(context).push(
+              new MaterialPageRoute(
+                builder: (context){
+                  container.onFocusDevice = device;
+                  print(device.name);
+                  return new DeviceDetailPage();
+                }
+              )
+            );
+          },
+          child: listTile
+        ),
+      );
+    return card;
+  }
+
+  List<Widget> buildInputDeviceList(){
+    List<Widget> inputList = new List<Widget>();
+
+    int len = devices.length;
+    for(int i = 0; i< len; i++){
+      if(devices[i].type == "output") continue;
+
+      inputList.add(
+        buildInputListTile(devices[i])
       );
     }
+    return inputList;
+  }
+
+  List<Widget> buildOutputDeviceList(){
+    List<Widget> outputList = new List<Widget>();
+
+    int len = devices.length;
+    for(int i = 0; i< len; i++){
+      if(devices[i].type == "input") continue;
+
+      outputList.add(
+        buildOutputListTile(devices[i])
+      );
+    }
+    return outputList;
+  }
+
+  List<Widget> buildDeviceList(int length){
+    List<Widget> list = new List<Widget>();
+
+    List<Widget> inputList = buildInputDeviceList();
+    List<Widget> outputList = buildOutputDeviceList();
+   
+
+    list = new List.from(inputList)..addAll(outputList);
+
     return list;
   }
 }

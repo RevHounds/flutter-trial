@@ -4,6 +4,7 @@ import '../model/device.dart';
 import '../../utils/rest-getway.dart';
 import '../model/user.dart';
 import '../model/schedule.dart';
+import '../model/trigger.dart';
 
 List <Location> startingList = 
  <Location> [
@@ -33,6 +34,10 @@ abstract class LocationRepository{
   Future<List<Location>> addScheduleOnDevice(Schedule schedule, Device device);
   Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device);
   Future<List<Location>> deleteScheduleOnDevice(Schedule schedule, Device device);
+  Future<List<Trigger>> getTriggers(Device device);
+  Future<List<Location>> addTriggerOnDevice(Trigger trigger, Device device);
+  Future<List<Location>> updateTriggerOnDevice(Trigger trigger, Device device);
+  Future<List<Location>> deleteTriggerOnDevice(Trigger trigger, Device device);
   Future<Schedule> changeRepeatOnSchedule(String day, Schedule schedule);
 }
 
@@ -244,125 +249,78 @@ class ProLocationRepository implements LocationRepository{
     schedule = temp;
     return Future.value(schedule);
   }
-}
-
-class MockLocationRepository implements LocationRepository{
-  List<Location> locations;
-  RestGetway getway;
 
   @override
-    Future<List<Location>> deleteDevice(Device device) {
-      // TODO: implement deleteDevice
-      return null;
-    }
-
-  @override
-  Future<bool> getLocationPairingStatus(Location location) {
-      // TODO: implement getLocationPairingStatus
-      return null;
-    }
-
-  @override
-  Future<List<Schedule>> getSchedules(Device device){
-    return getway.getSchedules(device).then(
-      (schedules){
-        return Future.value(schedules);
+  Future<List<Trigger>> getTriggers(Device device){
+    return getway.getTriggers(device).then(
+      (triggers){
+        return Future.value(triggers);
       }
     );
   }
 
   @override
-  Future<List<Location>> addScheduleOnDevice(Schedule schedule, Device device){
-    return getway.addSChedule(schedule, device).then(
-      (newSchedule){
-        return Future.value(locations);
-      }
-    );
-  }
-
-  @override
-  Future<List<Location>> updateScheduleOnDevice(Schedule schedule, Device device){
-    return getway.updateSchedule(schedule, device).then(
-      (newSchedule){
-        return Future.value(locations);
-      }
-    );
-  }
-
-  @override
-  Future<List<Location>> deleteScheduleOnDevice(Schedule schedule, Device device){
-    getway.deleteSchedule(schedule.uid);
-    return Future.value(locations);
-  }
-
-  MockLocationRepository(){
-    print("Mock location initialized");
-    locations = startingList;
-  }
-
-  Location findLocationByUID(String uid){
-    for(Location location in locations){
-      if(location.uid == uid)
-        return location;
-    }
-    return null;
-  }
-
-  @override
-  Future<Location> getDevicesOnLocation(Location location){
-    for (var location in locations) {
-      if(location.isEqualWithUID(location.uid)) 
-        return Future.value(location);
-    }
-    return Future.value(null);
-  }
-
-  @override
-  Future<List<Location>> getLocationsOfUser(User user){
-    return Future.value(locations);
-  }
-
-  @override
-  Future<List<Location>> addDeviceOnLocation(Device device, Location location){
-    String name = location.name;
-    print("adding device to $name");
-
-    for (int i = 0; i < locations.length; i++) {
-      if(locations[i].isEqualWithLocation(location)){
-        locations[i].devices.add(device);
-        return Future.value(locations);
-      }
-    }
-    return Future.value(null);
-  }
-
-  @override
-  Future<List<Location>> saveLocation(Location location){
-    locations.add(location);
-    print("Location saved");
-    return new Future.value(locations);
-  }
-
-  @override
-  Future<List<Location>> changeDeviceStateOnLocation(Device device, Location location){
-    for(int j = 0; j<locations.length; j++){
-      for(int i = 0; i<locations[j].devices.length; i++){
-        if(locations[j].devices[i].uid == device.uid){
-          locations[j].devices[i] = device;
+  Future<List<Location>> addTriggerOnDevice(Trigger trigger, Device device){
+    return getway.addTrigger(trigger, device).then(
+      (newtrigger){
+        device.triggers.add(trigger);
+      
+        for(int i = 0; i<locations.length; i++){
+          for(int j = 0; j<locations[i].devices.length; j++){
+            if(device.uid == locations[i].devices[j].uid){
+              locations[i].devices[j] = device;
+              return locations;
+            }
+          }
         }
+        return Future.value(locations);
       }
-    }
-    return Future.value(locations);
+    );
   }
 
   @override
-  Future<List<Location>> deleteLocation(String uid){
-    locations.removeAt(locations.indexOf(findLocationByUID(uid)));
-    return Future.value(locations);
+  Future<List<Location>> updateTriggerOnDevice(Trigger trigger, Device device){ 
+    return getway.updateTrigger(trigger, device).then(
+      (newtrigger){
+        if (newtrigger == null)
+          return this.locations;
+        
+        for(int i = 0; i<device.triggers.length; i++){
+          if(trigger.uid == device.triggers[i].uid){
+            device.triggers[i] = trigger;
+          }
+        }
+
+        for(int j = 0; j<locations.length; j++){
+          for(int i = 0; i<locations[j].devices.length; i++){
+            if(device.uid == locations[j].devices[i].uid){
+              locations[j].devices[i] = device;
+              return locations;
+            }
+          }
+        }
+        return locations;
+      }
+    );
   }
 
   @override
-  Future<Schedule> changeRepeatOnSchedule(String day, Schedule schedule){
-    return Future.value(schedule);
+  Future<List<Location>> deleteTriggerOnDevice(Trigger trigger, Device device){
+    getway.deleteTrigger(trigger.uid)
+      .then((uid){
+        for(int i = 0; i<locations.length; i++){
+          for(int j = 0; j<locations[i].devices.length; j++){
+            if(device.uid != locations[i].devices[j].uid) 
+              continue;
+            for(int k = 0; k<locations[j].devices[j].triggers.length; k++){
+              if(trigger.uid != locations[j].devices[j].triggers[k].uid)
+                continue;
+              locations[j].devices[j].triggers.removeAt(k);
+              return Future.value(locations);
+            }
+          }
+        }
+     });
   }
+
 }
