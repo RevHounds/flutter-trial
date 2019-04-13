@@ -35,11 +35,15 @@ abstract class CheckBoxTileContract{
 }
 
 abstract class DeviceDetailPageContract{
+  void onDeviceDeleted(List<Location> locations);
+}
+
+abstract class DeviceDetailSchedulePageContract implements DeviceDetailPageContract{
   void onSchedulesLoaded(List<Schedule> schedules);
   void onScheduleAdded(List<Location> locations);
 }
 
-abstract class DeviceTriggerPageContract{
+abstract class DeviceDetailTriggerPageContract implements DeviceDetailPageContract{
   void onTriggersLoaded(List<Trigger> triggers);
   void onTriggerAdded(List<Location> locations);
 }
@@ -283,7 +287,7 @@ class CheckboxTilePresenter{
 }
 
 class DeviceDetailPagePresenter{
-  DeviceDetailPageContract _view;
+  DeviceDetailSchedulePageContract _view;
   LocationRepository _repo;
 
   DeviceDetailPagePresenter(this._view){
@@ -291,7 +295,11 @@ class DeviceDetailPagePresenter{
   }
 
   void deleteDevice(Device device){
-    _repo.deleteDevice(device);
+    _repo.deleteDevice(device).then(
+      (locations){
+        this._view.onDeviceDeleted(locations);
+      }
+    );
   }
 
   void addSchedule(Device device){
@@ -312,7 +320,7 @@ class DeviceDetailPagePresenter{
 }
 
 class DeviceTriggerPagePresenter{
-  DeviceTriggerPageContract _view;
+  DeviceDetailTriggerPageContract _view;
   LocationRepository _repo;
 
   DeviceTriggerPagePresenter(this._view){
@@ -320,7 +328,11 @@ class DeviceTriggerPagePresenter{
   }
 
   void deleteDevice(Device device){
-    _repo.deleteDevice(device);
+    _repo.deleteDevice(device).then(
+      (locations){
+        this._view.onDeviceDeleted(locations);
+      }
+    );
   }
 
   void addTrigger(Trigger trigger, Device device){

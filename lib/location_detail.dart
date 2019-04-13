@@ -4,9 +4,9 @@ import 'data/model/location.dart';
 import 'data/model/device.dart';
 import 'view/location_presenter.dart';
 import 'utils/container.dart';
-import './add_device_page.dart';
+import './add_device.dart';
 import './widgets/loading_screen.dart';
-import 'device_detail.dart';
+import 'device_schedule.dart';
 import 'device_trigger.dart';
 
 class LocationDetail extends StatefulWidget{

@@ -17,7 +17,8 @@ class Location{
   Location.fromMap(Map<String, dynamic> map){
     this.uid = map["Id"];
     this.name = map["Name"];
-    this.picture = "http://www.for-example.org/img/main/forexamplelogo.png";
+    this.picture = map["Image"];
+    this.status = map["Status"];
     this.devices = new List<Device>();
   }
 

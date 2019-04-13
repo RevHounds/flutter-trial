@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'view/location_presenter.dart';
 import 'data/model/location.dart';
 import 'utils/container.dart';
-import './add_location_page.dart';
+import './add_location.dart';
 import 'location_detail.dart';
 import 'login.dart';
 import 'register.dart';
@@ -68,6 +68,7 @@ class MainMenuState extends State<MainMenu> implements LogoutContract{
                 pref.setBool("isLoggedIn", false).then((state){
                   print("logged off");
                   presenter.logout();
+                  Navigator.of(context).pop();
                 });
               },
             ),

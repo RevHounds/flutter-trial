@@ -15,7 +15,7 @@ class DeviceDetailPage extends StatefulWidget{
   State<DeviceDetailPage> createState() => new DeviceDetailPageState();
 }
 
-class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDetailPageContract{
+class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDetailSchedulePageContract{
   var container;
   Device device;
   List<Schedule> schedules;
@@ -49,6 +49,28 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
     });
   }
 
+  @override
+  void onDeviceDeleted(List<Location> locations){
+    container.locations = locations;
+    setState(() {
+      Location currentLocation;
+      for(Location location in locations){
+        if(location.isEqualWithUID(device.locationId)){
+          currentLocation = location;
+          break;
+        }
+      }
+
+      currentLocation.devices.removeWhere(
+        (currentDevice) => currentDevice.uid == this.device.uid        
+      );
+
+      container.devices = currentLocation.devices;
+
+      Navigator.of(context).pop();
+    });
+  }
+
   List<Widget> _generateScheduleList(List<Schedule> schedules){
     List<ScheduleCard> cards = new List<ScheduleCard>();
 
@@ -76,13 +98,14 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   void _deleteDevice(){
     print("deleting device");
     popUpDeleteDevice();
+    Navigator.of(context).pop();
   }
 
   Future<Null> popUpDeleteDevice() async {
     String deviceName = this.device.name;
     return showDialog<Null>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return new AlertDialog(
           title: new Text('Delete Device'),

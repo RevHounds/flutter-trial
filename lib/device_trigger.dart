@@ -15,7 +15,7 @@ class DeviceTriggerPage extends StatefulWidget{
   State<DeviceTriggerPage> createState() => new DeviceTriggerPageState();
 }
 
-class DeviceTriggerPageState extends State<DeviceTriggerPage> implements DeviceTriggerPageContract{
+class DeviceTriggerPageState extends State<DeviceTriggerPage> implements DeviceDetailTriggerPageContract{
   var container;
   Device device;
   List<Trigger> triggers;
@@ -49,6 +49,14 @@ class DeviceTriggerPageState extends State<DeviceTriggerPage> implements DeviceT
     });
   }
 
+  @override
+  void onDeviceDeleted(List<Location> locations){
+    container.locations = locations;
+    setState(() {
+      Navigator.of(context).pop();
+    });
+  }
+
   List<Widget> _generateTriggerList(List<Trigger> triggers){
     List<TriggerCard> cards = new List<TriggerCard>();
 
@@ -61,8 +69,7 @@ class DeviceTriggerPageState extends State<DeviceTriggerPage> implements DeviceT
 
   void _addTriggers(){
     Trigger newTrigger = new Trigger(locationId: device.locationId,
-                                     inputPort: device.port,
-                                     outputPort: -1);
+      inputPort: device.port, outputPort: -1);
 
     container.onFocusTrigger = newTrigger;
     this.device = container.onFocusDevice;
