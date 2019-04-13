@@ -174,6 +174,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
     container = StateContainer.of(context);
     location = container.onFocusLocation;
     devices = location.devices;
+    container.outputs = new List<Device>();
     
     var page;
     var body;
@@ -305,6 +306,7 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
         value: device.status,
         onChanged: (value){
           device.status = !device.status;
+          print("status: " + device.status.toString());
           presenter.changeState(location, device);
         },
       ),
@@ -346,15 +348,16 @@ class DeviceListState extends State<DeviceList> implements LocationDetailContrac
 
   List<Widget> buildOutputDeviceList(){
     List<Widget> outputList = new List<Widget>();
-
+    List<Device> outputs = new List();
     int len = devices.length;
     for(int i = 0; i< len; i++){
       if(devices[i].type == "input") continue;
-
+      outputs.add(devices[i]);
       outputList.add(
         buildOutputListTile(devices[i])
       );
     }
+    container.outputs = outputs;
     return outputList;
   }
 

@@ -45,7 +45,7 @@ class TriggerCardState extends State<TriggerCard> implements TriggerCardContract
     return new Card(
       child: new FlatButton(
         child: new ListTile(
-          title: new Text("Turn port " + trigger.outputPort.toString()),
+          title: new Text("If " + trigger.inputCondition.toString() + " then turn port " + trigger.outputPort.toString()),
           trailing: new Text(
             (trigger.outputCondition) ? "ON" : "OFF"
           )

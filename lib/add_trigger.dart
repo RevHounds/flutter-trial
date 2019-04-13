@@ -15,12 +15,12 @@ class AddTriggerPage extends StatefulWidget{
 
 class AddTriggerPageState extends State<AddTriggerPage> implements AddTriggerPageContract{
   Device device;
-  List<Device> outputs;
   Trigger trigger;
-  AddTriggerPagePresenter presenter;
   var container;
+  List<Device> outputs = [];
   List<Widget> components = [];
   List<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  AddTriggerPagePresenter presenter;
 
   bool isLoading = true;
 
@@ -72,8 +72,36 @@ class AddTriggerPageState extends State<AddTriggerPage> implements AddTriggerPag
     });
   }
 
+  void _onDropdownMenuChanged(int val){
+    print("Ini yang udah dipilih " + val.toString());
+    setState(() {
+      this.trigger.outputPort = val;
+    });
+  }
+
   void populateComponents(){
+    print("ini lagi bikin dropdown");
     /////////perlu dibikin ui nya di sini
+    ///
+
+    List<DropdownMenuItem<int>> dropdownItems = new List();
+
+    dropdownItems.add(
+      new DropdownMenuItem(
+        value: -1,
+        child: new Text("Choose a device")
+      )
+    );
+
+    for(Device output in outputs){
+      print(output.port);
+      dropdownItems.add(
+        new DropdownMenuItem(
+          value: output.port,
+          child: new Text(output.name),
+        )
+      );
+    }
     
     Widget inputConditionContainer = new Card(
       child: new Padding(
@@ -203,7 +231,14 @@ class AddTriggerPageState extends State<AddTriggerPage> implements AddTriggerPag
               ),
             ),
           ),
-           
+          new Align(
+            alignment: Alignment.centerLeft,
+            child: new DropdownButton(
+              value: trigger.outputPort,
+              items: dropdownItems,
+              onChanged: _onDropdownMenuChanged
+            )
+          ),          
         ],
       ),
       ), 
@@ -259,6 +294,13 @@ class AddTriggerPageState extends State<AddTriggerPage> implements AddTriggerPag
     container = StateContainer.of(context);
     this.device = container.onFocusDevice;
     this.trigger = container.onFocusTrigger;
+    this.outputs = container.outputs;
+    Location location = container.onFocusLocation;
+
+    this.trigger.deviceId = this.device.uid;
+    this.trigger.locationId = location.uid;
+
+    print("Cobain dulu "+ outputs.length.toString());
     
     populateComponents();
 

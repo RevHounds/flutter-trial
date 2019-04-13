@@ -12,7 +12,7 @@ class Injector{
   static MockApplicationRepository mockApplicationRepository = new MockApplicationRepository();
 
   static void configure(Flavor flavor) {
-    _flavor = flavor; 
+    _flavor = flavor;
   }
 
   factory Injector() {

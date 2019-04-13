@@ -25,7 +25,7 @@ class RestGetway{
   static final deleteLocationUrl = baseUrl + "/delete-location";
   static final getDevicesUrl = baseUrl + "/get-devices";
   static final addDeviceUrl = baseUrl + "/add-device";
-  static final deleteDeviceUrl = baseUrl + "/delete-devices";
+  static final deleteDeviceUrl = baseUrl + "/delete-device";
   static final updateDeviceUrl = baseUrl + "/update-device";
   static final getScheduleUrl = baseUrl + "/get-schedules";
   static final addScheduleUrl = baseUrl + "/add-schedule";
@@ -33,7 +33,7 @@ class RestGetway{
   static final deleteScheduleDeviceUrl = baseUrl + "/delete-device";
   static final getTriggersUrl = baseUrl + "/get-triggers";
   static final addTriggerUrl = baseUrl + "/add-trigger";
-  static final updateTriggerUrl = baseUrl + "/update-triggers";
+  static final updateTriggerUrl = baseUrl + "/update-trigger";
   static final deleteTriggerUrl = baseUrl + "/delete-trigger";
 
   String _authenticationKey = "";
@@ -318,9 +318,10 @@ class RestGetway{
       "name" : device.name,
       "locationid" : location.uid,
       "port" : device.port,
-      "status" : !device.status,
+      "status" : device.status,
       "description" : device.description,
       "icon" : device.icon,
+      "type" : device.type
     },  
       headers: {
         "authorization" : "Bearer " + _authenticationKey
@@ -330,7 +331,6 @@ class RestGetway{
         print(res.toString());
         if(res["error"] == "false"){
           print("bener masuk kok");
-          device.status = !device.status;
           return Future.value(device);
         }
         return Future.value(null);
@@ -486,7 +486,7 @@ class RestGetway{
   Future<Trigger> addTrigger(Trigger trigger, Device device){
     print("Adding new trigger to a device");
     print(_authenticationKey);
-    print("Schedule UID: " + trigger.uid);
+    print("Trigger UID: " + trigger.uid);
     print("Device UID: " + device.uid);
   
     return NetworkUtils().post(addTriggerUrl, body: {
@@ -495,7 +495,8 @@ class RestGetway{
       "outputport" : trigger.outputPort,
       "inputcondition" : trigger.inputCondition,
       "outputcondition" : trigger.outputCondition,
-      "locationid" : trigger.locationId
+      "locationid" : trigger.locationId,
+      "deviceid" : trigger.deviceId,
     },  
       headers: {
         "authorization" : "Bearer " + _authenticationKey
