@@ -11,7 +11,7 @@ class StateContainer extends StatefulWidget{
   Device onFocusDevice;
   Trigger onFocusTrigger;
   List<Location> locations;
-  List<Device> outputs;
+  List<Device> devices;
   Widget child;
   User user;
   bool errorLogin = false;
@@ -30,7 +30,7 @@ class StateContainer extends StatefulWidget{
 
 class StateContainerState extends State<StateContainer>{
   List<Location> locations;
-  List<Device> outputs;
+  List<Device> devices;
   Location onFocusLocation;
   Schedule onFocusSchedule;
   Trigger onFocusTrigger;

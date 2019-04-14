@@ -27,6 +27,10 @@ abstract class LocationPairingStatusContract{
   void onPairingNotFinished(Location locations);
 }
 
+abstract class OutputDeviceTileStateContract{
+  void onDeviceStateChanged(device);
+}
+
 class LocationListPresenter{
   LocationListContract _view;
   LocationRepository _repo;
@@ -72,19 +76,29 @@ class AddLocationPresenter{
   }
 }
 
+class OutputDevicePresenter{
+  LocationRepository _repo;
+  OutputDeviceTileStateContract _view;
+
+  OutputDevicePresenter(this._view){
+    this._repo = Injector().locationRepository;
+  }
+
+  void changeDeviceStatus(Device device, bool value){
+    _repo.changeDeviceState(device, value).then(
+      (device){
+        _view.onDeviceStateChanged(device);
+      }
+    );
+  }
+}
+
 class LocationDetailPresenter{
   LocationRepository _repo;
   LocationDetailContract _view;
 
   LocationDetailPresenter(this._view){
     this._repo = Injector().locationRepository;
-  }
-
-  void changeState(Location location, Device device){
-    _repo.changeDeviceStateOnLocation(device, location)
-      .then((locations){
-        _view.onChangeState(locations);
-      });
   }
   
    void loadLocationByUID(Location location){

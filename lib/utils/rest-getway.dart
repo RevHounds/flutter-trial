@@ -307,16 +307,12 @@ class RestGetway{
     });
   }
 
-  Future<Device> updateDevice(Device device, Location location){
-    print("Updating Device in location");
-    print(_authenticationKey);
-    print("Location ID: " + location.uid);
-    print("Device UID: " + device.uid);
-  
+  Future<Device> updateDevice(Device device){
+    print("Update device");
     return NetworkUtils().post(updateDeviceUrl, body: {
       "id" : device.uid,
       "name" : device.name,
-      "locationid" : location.uid,
+      "locationid" : device.locationId,
       "port" : device.port,
       "status" : device.status,
       "description" : device.description,

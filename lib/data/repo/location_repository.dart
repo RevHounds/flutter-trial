@@ -27,7 +27,7 @@ abstract class LocationRepository{
   Future<List<Location>> getLocationsOfUser(User user);
   Future<List<Location>> saveLocation(Location location);
   Future<List<Location>> addDeviceOnLocation(Device device, Location location);
-  Future<List<Location>> changeDeviceStateOnLocation(Device device, Location location);
+  Future<Device> changeDeviceState(Device device, bool value);
   Future<List<Location>> deleteLocation(String uid);
   Future<List<Location>> deleteDevice(Device device);
   Future<List<Schedule>> getSchedules(Device device);
@@ -120,17 +120,10 @@ class ProLocationRepository implements LocationRepository{
   }
 
   @override
-  Future<List<Location>> changeDeviceStateOnLocation(Device device, Location location){
-    return getway.updateDevice(device, location).then(
+  Future<Device> changeDeviceState(Device device, bool value){
+    return getway.updateDevice(device).then(
       (device){
-        for(int j = 0; j<locations.length; j++){
-          for(int i = 0; i<locations[j].devices.length; i++){
-            if(locations[j].devices[i].uid == device.uid){
-              locations[j].devices[i] = device;
-            }
-          }
-        }
-        return Future.value(locations);
+        return Future.value(device);
       }
     );
   }
