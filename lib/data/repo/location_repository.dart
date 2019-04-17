@@ -218,7 +218,7 @@ class ProLocationRepository implements LocationRepository{
 
   @override
   Future<List<Location>> deleteScheduleOnDevice(Schedule schedule, Device device){
-    getway.deleteSchedule(schedule.uid)
+    return getway.deleteSchedule(schedule.uid)
       .then((uid){
         for(int i = 0; i<locations.length; i++){
           for(int j = 0; j<locations[i].devices.length; j++){
@@ -228,10 +228,11 @@ class ProLocationRepository implements LocationRepository{
               if(schedule.uid != locations[j].devices[j].schedules[k].uid)
                 continue;
               locations[j].devices[j].schedules.removeAt(k);
-              return Future.value(locations);
+              return Future.value(this.locations);
             }
           }
         }
+        return Future.value(this.locations);
      });
   }
 

@@ -30,7 +30,7 @@ class RestGetway{
   static final getScheduleUrl = baseUrl + "/get-schedules";
   static final addScheduleUrl = baseUrl + "/add-schedule";
   static final updateScheduleUrl = baseUrl + "/update-schedule";
-  static final deleteScheduleDeviceUrl = baseUrl + "/delete-device";
+  static final deleteScheduleDeviceUrl = baseUrl + "/delete-schedule";
   static final getTriggersUrl = baseUrl + "/get-triggers";
   static final addTriggerUrl = baseUrl + "/add-trigger";
   static final updateTriggerUrl = baseUrl + "/update-trigger";
@@ -412,6 +412,7 @@ class RestGetway{
         "authorization" : "Bearer " + _authenticationKey
       }
     ).then((res){
+      print("RESULT: ");
       print(res.toString());
       if(res["error"] == "false")
         return Future.value(uid);

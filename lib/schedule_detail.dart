@@ -25,7 +25,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
 
   bool isLoading = true;
 
-  ScheduleDetailPage(){
+  ScheduleDetailPageState(){
     presenter = new ScheduleDetailPagePresenter(this);
     components = new List();
   }
@@ -43,13 +43,57 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(this.device.name + '\'s Schedule'),
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: deleteSchedule
+          )
+        ],
       ),
       body: new ListView(
         children: components
       )
     );
   }
+
+  void deleteSchedule(){
+    popUpDeleteSchedule();
+  }
   
+  Future<Null> popUpDeleteSchedule() async {
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('Delete Schedule'),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text("Are you sure you wanted to delete this schedule?")
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton( 
+              child: new Text("Delete"),
+              onPressed: () {
+                presenter.deleteSchedule(schedule, device);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void onScheduleSaved(List<Location> locations, Device newDevice){
     container.locations = locations;
@@ -96,66 +140,66 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> implements Sched
     );
 
     Widget repeatDayButtons = new Card(
-            child: new Padding(
-              padding: new EdgeInsets.only(top: 10.0, left: 10.0, bottom: 10.0),
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new Padding(
-                    padding: new EdgeInsets.only(bottom: 5.0),
-                    child: new Text(
-                      "Repeat",
-                      style: new TextStyle(
-                        fontSize: 18
-                      ),
-                    ),
-                  ),
-                  new ButtonBar(
-                    alignment: MainAxisAlignment.center,
-                    children: days.map(
-                                (day)=> new DayButton(day, this.schedule)
-                              ).toList()
-                  )
-                ],
-              )
+      child: new Padding(
+        padding: new EdgeInsets.only(top: 10.0, left: 10.0, bottom: 10.0),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            new Padding(
+              padding: new EdgeInsets.only(bottom: 5.0),
+              child: new Text(
+                "Repeat",
+                style: new TextStyle(
+                  fontSize: 18
+                ),
+              ),
+            ),
+            new ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: days.map(
+                          (day)=> new DayButton(day, this.schedule)
+                        ).toList()
             )
-          );
+          ],
+        )
+      )
+    );
 
     Widget confirmationButtons = new Row(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              new MaterialButton(
-                child: new Text(
-                  "Cancel",
-                  style: new TextStyle(
-                    fontSize: 18,
-                    color: Colors.blue
-                  ),
-                ),
-                color: Colors.white,
-                height: 40,
-                minWidth: 120.0,
-                onPressed: _cancelModify
-              ),
-              new MaterialButton(
-                child: new Text(
-                  "Save",
-                  style: new TextStyle(
-                    fontSize: 18,
-                    color: Colors.white
-                  ),
-                ),
-                color: Colors.blue,
-                height: 40,
-                minWidth: 120.0,
-                onPressed: (){
-                  presenter.saveSchedule(this.schedule, this.device);
-                },
-              ),
-            ],
-          );
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        new MaterialButton(
+          child: new Text(
+            "Cancel",
+            style: new TextStyle(
+              fontSize: 18,
+              color: Colors.blue
+            ),
+          ),
+          color: Colors.white,
+          height: 40,
+          minWidth: 120.0,
+          onPressed: _cancelModify
+        ),
+        new MaterialButton(
+          child: new Text(
+            "Save",
+            style: new TextStyle(
+              fontSize: 18,
+              color: Colors.white
+            ),
+          ),
+          color: Colors.blue,
+          height: 40,
+          minWidth: 120.0,
+          onPressed: (){
+            presenter.saveSchedule(this.schedule, this.device);
+          },
+        ),
+      ],
+    );
 
     components = new List();
 
