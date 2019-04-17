@@ -301,7 +301,7 @@ class ProLocationRepository implements LocationRepository{
 
   @override
   Future<List<Location>> deleteTriggerOnDevice(Trigger trigger, Device device){
-    getway.deleteTrigger(trigger.uid)
+    return getway.deleteTrigger(trigger.uid)
       .then((uid){
         for(int i = 0; i<locations.length; i++){
           for(int j = 0; j<locations[i].devices.length; j++){
@@ -315,6 +315,7 @@ class ProLocationRepository implements LocationRepository{
             }
           }
         }
+        return Future.value(locations);
      });
   }
 
