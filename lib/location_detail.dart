@@ -21,17 +21,75 @@ class LocationDetail extends StatefulWidget{
   LocationDetailState createState() => new LocationDetailState(locationUID);
 }
 
-class LocationDetailState extends State<LocationDetail> implements LocationDetailAppBarContract{
+class LocationDetailState extends State<LocationDetail> implements LocationDetailContract{
   Location location;
   var container;
   String locationUID;
   List<Device> devices;
-  LocationAppBarPresenter presenter;  
+  LocationDetailPresenter presenter;  
   bool closePage = false;
   List<Widget> locationDetailPage;
+  bool isSearching;
 
   LocationDetailState(this.locationUID){
-    presenter = new LocationAppBarPresenter(this);
+    presenter = new LocationDetailPresenter(this);
+    isSearching = true;
+    this.devices = new List<Device>();
+  }
+
+  @override
+  Widget build(BuildContext context){
+    container = StateContainer.of(context);
+    this.location = container.onFocusLocation;
+
+    var body;
+
+    locationDetailPage = new List<Widget>();
+    locationDetailPage.add(buildHeader());
+    
+    if(isSearching){
+      presenter.loadLocationDevices(location);
+      body = new LoadingScreen();
+      locationDetailPage.add(body);
+    } else{
+      body = new List<Widget>();  
+      body.addAll(buildInputDeviceList());
+      body.addAll(buildOutputDeviceList());
+      locationDetailPage.addAll(body);
+    }    
+
+    locationDetailPage.add(buildFooter());
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text(location.name),
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: deleteLocation,
+            )
+        ],
+      ),
+      body: new ListView(
+        children: locationDetailPage,
+      ),
+      floatingActionButton: new FloatingActionButton(
+        child: new Icon(Icons.add),
+        onPressed: (){
+          addDeviceTo(location);
+        },
+      ),
+    );
+  }
+
+  @override
+  void onLoadLocation(Location location) {
+    setState(() {
+      this.location = location;
+      this.devices = location.devices;
+      this.isSearching = false;
+      container.onFocusLocation = location;
+    });
   }
 
   @override
@@ -81,6 +139,9 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
 
   int getDeviceOnStatusCount(){
     int count = 0;
+    if(devices.length == 0)
+      return count;
+
     for(Device device in devices){
       if(device.status)
         count++;
@@ -148,35 +209,18 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
     );
   }
 
-  Widget buildInputListTile(Device device){
-    ListTile listTile = new ListTile(
-      leading: new Icon(Icons.lightbulb_outline),
-      title: new Text(device.name),
-      subtitle: new Text(device.type),
-      trailing: new Text(
-        (device.status) ? "TRUE" : "FALSE"
-      )
-    );
+  List<Widget> buildDeviceList(int length){
+    List<Widget> list = new List<Widget>();
 
-    Widget card = new Card(
-        elevation: 1.5,
-        child: new FlatButton(
-          onPressed: (){
-            Navigator.of(context).push(
-              new MaterialPageRoute(
-                builder: (context){
-                  container.onFocusDevice = device;
-                  print(device.name);
-                  return new DeviceTriggerPage();
-                }
-              )
-            );
-          },
-          child: listTile
-        ),
-      );
-    return card;
+    List<Widget> inputList = buildInputDeviceList();
+    List<Widget> outputList = buildOutputDeviceList();
+   
+
+    list = new List.from(inputList)..addAll(outputList);
+
+    return list;
   }
+
 
   List<Widget> buildInputDeviceList(){
     List<Widget> inputList = new List<Widget>();
@@ -198,53 +242,7 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
       outputs.add(devices[i]);
       outputList.add(new OutputDeviceTile(devices[i]));
     }
-    container.outputs = outputs;
     return outputList;
-  }
-
-  List<Widget> buildDeviceList(int length){
-    List<Widget> list = new List<Widget>();
-
-    List<Widget> inputList = buildInputDeviceList();
-    List<Widget> outputList = buildOutputDeviceList();
-   
-
-    list = new List.from(inputList)..addAll(outputList);
-
-    return list;
-  }
-
-  @override
-  Widget build(BuildContext context){
-    container = StateContainer.of(context);
-    this.location = container.onFocusLocation;
-
-    locationDetailPage = new List<Widget>();
-    locationDetailPage.add(buildHeader());
-    locationDetailPage.addAll(buildInputDeviceList());
-    locationDetailPage.add(buildFooter());
-    
-
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(location.name),
-        actions: <Widget>[
-          new IconButton(
-            icon: new Icon(Icons.delete),
-            onPressed: deleteLocation,
-            )
-        ],
-      ),
-      body: new ListView(
-        children: locationDetailPage,
-      ),
-      floatingActionButton: new FloatingActionButton(
-        child: new Icon(Icons.add),
-        onPressed: (){
-          addDeviceTo(location);
-        },
-      ),
-    );
   }
 
   void addDeviceTo(Location location){
@@ -260,88 +258,3 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
     );
   }
 }
-
-// class DeviceList extends StatefulWidget{
-//   final String locationUID;
-
-//   DeviceList(this.locationUID);
-
-//   @override
-//   DeviceListState createState() => new DeviceListState();
-// }
-
-// class DeviceListState extends State<DeviceList> implements LocationDetailContract{
-//   var container;
-//   bool isSearching;
-//   Location location;
-//   LocationDetailPresenter presenter;
-//   List<Device> devices;
-
-//   DeviceListState(){
-//     presenter = new LocationDetailPresenter(this);
-//   }
-
-//   @override
-//   void onLoadLocation(Location location){
-//     container.onFocusLocation = location;
-//     isSearching = false;
-    
-//     String locationName = location.name;
-//     print("location name: $locationName");
-
-//     setState(() {
-//       location = container.onFocusLocation;
-//     });
-//   }
-
-//   @override
-//   void onChangeState(List<Location> locations){
-//     container.locations = locations;
-
-//     for(location in locations){
-//       if(this.location.uid == location.uid){
-//         this.location = location;
-//       }
-//     }
-
-//     setState(() {
-//       if (this.devices != location.devices)
-//         this.devices = location.devices;
-//     });
-//   }
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     isSearching = true;
-//   }
-
-//   @override
-//   Widget build(BuildContext context){
-//     container = StateContainer.of(context);
-//     location = container.onFocusLocation;
-//     devices = location.devices;
-//     container.outputs = new List<Device>();
-    
-//     var page;
-//     var body;
-
-//     // if(isSearching){
-//     //   presenter.loadLocationByUID(location);
-//     //   body = new LoadingScreen();
-//     // } else{
-//     //   body = buildDeviceList(devices.length);
-//     // }
-
-//     // var curators = new List<Widget>();
-
-//     // curators.add(buildHeader());
-//     // curators.addAll(buildDeviceList(devices.length).toList());
-//     // curators.add(buildFooter());
-
-//     page = new ListView(
-//       children: curators
-//     );
-//     return page;
-//   }
-// }

@@ -309,6 +309,9 @@ class RestGetway{
 
   Future<Device> updateDevice(Device device){
     print("Update device");
+    print(device.uid);
+    print(device.name);
+    print(device.locationId);
     return NetworkUtils().post(updateDeviceUrl, body: {
       "id" : device.uid,
       "name" : device.name,

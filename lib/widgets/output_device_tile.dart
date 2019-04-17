@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/model/device.dart';
-import '../view/location_presenter.dart';
+import '../view/device_presenter.dart';
 import '../device_schedule.dart';
 import '../utils/container.dart';
 
@@ -11,15 +11,20 @@ class OutputDeviceTile extends StatefulWidget{
   OutputDeviceTileState createState() => new OutputDeviceTileState(device);
 }
 
-class OutputDeviceTileState extends State<OutputDeviceTile> implements OutputDeviceTileStateContract{
-  Device device;
-  OutputDevicePresenter _devicePresenter;
-  OutputDeviceTileState(this.device);
+class OutputDeviceTileState extends State<OutputDeviceTile> implements OutputDeviceTileContract{
   var container;
+  Device device;
+  OutputDeviceTilePresenter _devicePresenter;
+  OutputDeviceTileState(this.device){
+    this._devicePresenter = new OutputDeviceTilePresenter(this);
+  }
 
   @override
-  void onDeviceStateChanged(device) {
-    this.device = device;
+  void onStateChanged(Device device) {
+    setState(() {
+      this.device = device;
+      print(this.device.status.toString());
+    });
   }
 
   @override
@@ -46,7 +51,7 @@ class OutputDeviceTileState extends State<OutputDeviceTile> implements OutputDev
           trailing: new Switch(
             value: this.device.status,
             onChanged: (bool value){
-              _devicePresenter.changeDeviceStatus(device, value);
+              _devicePresenter.changeDeviceState(device, value);
             },
           ),
         ),

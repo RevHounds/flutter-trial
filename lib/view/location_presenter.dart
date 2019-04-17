@@ -15,10 +15,6 @@ abstract class AddLocationContract{
 
 abstract class LocationDetailContract{
   void onLoadLocation(Location location);
-  void onChangeState(List<Location> locations);
-}
-
-abstract class LocationDetailAppBarContract{
   void onDeleteLocation(List<Location> location);
 }
 
@@ -76,32 +72,20 @@ class AddLocationPresenter{
   }
 }
 
-class OutputDevicePresenter{
-  LocationRepository _repo;
-  OutputDeviceTileStateContract _view;
-
-  OutputDevicePresenter(this._view){
-    this._repo = Injector().locationRepository;
-  }
-
-  void changeDeviceStatus(Device device, bool value){
-    _repo.changeDeviceState(device, value).then(
-      (device){
-        _view.onDeviceStateChanged(device);
-      }
-    );
-  }
-}
-
 class LocationDetailPresenter{
-  LocationRepository _repo;
+  LocationRepository _repo = Injector().locationRepository;
   LocationDetailContract _view;
 
-  LocationDetailPresenter(this._view){
-    this._repo = Injector().locationRepository;
+  LocationDetailPresenter(this._view);
+
+  void deleteLocation(String uid){
+    _repo.deleteLocation(uid)
+      .then((locations){ 
+        _view.onDeleteLocation(locations);
+      });
   }
-  
-   void loadLocationByUID(Location location){
+
+  void loadLocationDevices(Location location){
     String uid = location.uid;
     print("ini lagi cobain cari si $uid");
 
@@ -109,20 +93,6 @@ class LocationDetailPresenter{
       .then((location){
         print("location found!");
         _view.onLoadLocation(location);
-      });
-  }
-}
-
-class LocationAppBarPresenter{
-  LocationRepository _repo = Injector().locationRepository;
-  LocationDetailAppBarContract _view;
-
-  LocationAppBarPresenter(this._view);
-
-  void deleteLocation(String uid){
-    _repo.deleteLocation(uid)
-      .then((locations){ 
-        _view.onDeleteLocation(locations);
       });
   }
 }

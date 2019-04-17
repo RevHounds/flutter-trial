@@ -121,6 +121,7 @@ class ProLocationRepository implements LocationRepository{
 
   @override
   Future<Device> changeDeviceState(Device device, bool value){
+    device.status = value;
     return getway.updateDevice(device).then(
       (device){
         return Future.value(device);

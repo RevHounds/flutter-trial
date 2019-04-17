@@ -35,6 +35,7 @@ class Device{
     this.description = map["Description"];
     this.port = map["Port"];
     this.type = map["Type"];
+    this.locationId = map["LocationId"];
     this.schedules = new List<Schedule>();
     this.triggers = new List<Trigger>();
   }
