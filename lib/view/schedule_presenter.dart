@@ -197,6 +197,11 @@ class ScheduleDetailPagePresenter{
     );
   }
 
+  void changeIsRanged(Schedule schedule){
+    schedule.isRanged = !schedule.isRanged;
+    _view.onScheduleModified(schedule);
+  }
+
   void deleteSchedule(Schedule schedule, Device device){
     _repo.deleteScheduleOnDevice(schedule, device).
       then((locations){

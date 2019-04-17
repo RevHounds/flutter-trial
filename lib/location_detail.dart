@@ -6,8 +6,6 @@ import 'view/location_presenter.dart';
 import 'utils/container.dart';
 import './add_device.dart';
 import './widgets/loading_screen.dart';
-import 'device_schedule.dart';
-import 'device_trigger.dart';
 import 'widgets/input_device_tile.dart';
 import 'widgets/output_device_tile.dart';
 
@@ -94,7 +92,10 @@ class LocationDetailState extends State<LocationDetail> implements LocationDetai
 
   @override
   void onDeleteLocation(List<Location> locations){
-    container.locations = locations;
+    setState(() {
+      locations.removeWhere((location) => location.isEqualWithLocation(this.location));
+      container.locations = locations;
+    });
     Navigator.of(context).pop();
   }
 

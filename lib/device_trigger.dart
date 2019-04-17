@@ -44,8 +44,8 @@ class DeviceTriggerPageState extends State<DeviceTriggerPage> implements DeviceD
 
   @override
   void onTriggerAdded(List<Location> locations){
-    container.locataions = locations;
     setState(() {
+    container.locataions = locations;
     });
   }
 
@@ -53,6 +53,17 @@ class DeviceTriggerPageState extends State<DeviceTriggerPage> implements DeviceD
   void onDeviceDeleted(List<Location> locations){
     container.locations = locations;
     setState(() {
+      Location currentLocation;
+      for(Location location in locations){
+        if(location.isEqualWithUID(device.locationId)){
+          currentLocation = location;
+          break;
+        }
+      }
+      currentLocation.devices.removeWhere(
+        (currentDevice) => currentDevice.uid == this.device.uid        
+      );
+      container.devices = currentLocation.devices;
       Navigator.of(context).pop();
     });
   }

@@ -8,21 +8,86 @@ import 'location_detail.dart';
 import 'login.dart';
 import 'register.dart';
 import './view/app_presenter.dart';
+import 'widgets/location_card.dart';
 
 class MainMenu extends StatefulWidget{
   @override
   State<MainMenu> createState() => new MainMenuState();
 }
 
-class MainMenuState extends State<MainMenu> implements LogoutContract{
-  MainMenuPresenter presenter;
-  LocationList locationList = new LocationList();
+class MainMenuState extends State<MainMenu> implements LogoutContract, LocationListContract{
+  MainMenuPresenter mainMenuPresenter;
+  LocationListPresenter locationListPresenter;
+  List<Location> locations;
   var container;
+  bool isSearching;
+
+  MainMenuState(){
+    isSearching = true;
+    mainMenuPresenter = new MainMenuPresenter(this);
+    locationListPresenter = new LocationListPresenter(this);
+    init();
+  }
 
   void init() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setBool("isLoggedIn", true);
-  }    
+  }
+
+  @override
+  Widget build(BuildContext context){
+    container = StateContainer.of(context);
+    locations = container.locations;
+
+    if(locations != null)
+      locations.removeWhere((location) => location.status == "pending");
+
+    print("Done Called");
+    var widget;
+
+    if(isSearching){
+      locationListPresenter.loadLocations(container.user);
+      print("Went in");
+      widget = new Center(
+        child: new Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          child: new CircularProgressIndicator()
+        )
+      );
+    } else{
+      int n = locations.length;
+      print("Count: $n");
+      widget = new GridView.count(
+        crossAxisCount: 2,
+        padding: new EdgeInsets.all(4.0),
+        children: 
+          locations.map((location) => 
+              new LocationCard(location)).toList(),
+      );
+    }
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("Main Menu"),
+        actions: <Widget>[
+          new IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: refreshData,
+          ),
+          new IconButton(
+            icon: Icon(Icons.power_settings_new),
+            onPressed: _logout,
+          )
+        ],
+      ),
+      body: widget,
+      floatingActionButton: new FloatingActionButton(
+        child: new Icon(Icons.add),
+        onPressed: (){_gotoAddLocationPage(context);
+        },
+      ),
+    );
+  }
 
   @override
   void onLogout(){
@@ -35,12 +100,8 @@ class MainMenuState extends State<MainMenu> implements LogoutContract{
       ));
   }
   
-  MainMenuState(){
-    presenter = new MainMenuPresenter(this);
-    init();
-  }
 
-  Future<Null> _neverSatisfied() async {
+  Future<Null> _logOutPopUp() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     return showDialog<Null>(
       context: context,
@@ -67,7 +128,7 @@ class MainMenuState extends State<MainMenu> implements LogoutContract{
               onPressed: () {
                 pref.setBool("isLoggedIn", false).then((state){
                   print("logged off");
-                  presenter.logout();
+                  mainMenuPresenter.logout();
                   Navigator.of(context).pop();
                 });
               },
@@ -76,70 +137,6 @@ class MainMenuState extends State<MainMenu> implements LogoutContract{
         );
       },
     );
-  }
-
-  void _logout(){
-    _neverSatisfied();
-  }
-
-  void refreshData(){
-    locationList.presenter.loadLocations(container.user);
-  }
-
-  @override
-  Widget build(BuildContext context){
-    container = StateContainer.of(context);
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Main Menu"),
-        actions: <Widget>[
-          new IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: refreshData,
-          ),
-          new IconButton(
-            icon: Icon(Icons.power_settings_new),
-            onPressed: _logout,
-          )
-        ],
-      ),
-      body: locationList,
-      floatingActionButton: new FloatingActionButton(
-        child: new Icon(Icons.add),
-        onPressed: (){_gotoAddLocationPage(context);
-        },
-      ),
-    );
-  }
-
-  void _gotoAddLocationPage(BuildContext context){
-    Navigator.push(
-      context,
-      new MaterialPageRoute(
-        settings: const RouteSettings(name: AddLocationPage.routeName),
-        builder: (context){
-          return new AddLocationPage();
-        }
-      )
-    );
-  }
-}
-
-class LocationList extends StatefulWidget{
-  @override
-  LocationListPresenter presenter;
-  LocationListState createState() => new LocationListState(this.presenter);
-}
-
-class LocationListState extends State<LocationList> implements LocationListContract{
-  LocationListPresenter presenter;
-  List<Location> locations;
-  bool isSearching;
-  var container;
-
-  LocationListState(this.presenter){
-    isSearching = true;
-    presenter = new LocationListPresenter(this);
   }
 
   @override
@@ -167,85 +164,26 @@ class LocationListState extends State<LocationList> implements LocationListContr
     isSearching = true;
   }
 
-
-  @override
-  Widget build(BuildContext context){
-    container = StateContainer.of(context);
-    locations = container.locations;
-
-    if(locations != null)
-      locations.removeWhere((location) => location.status == "pending");
-
-    print("Done Called");
-
-    var widget;
-
-    if(isSearching){
-      presenter.loadLocations(container.user);
-      print("Went in");
-
-      widget = new Center(
-        child: new Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-          child: new CircularProgressIndicator()
-        )
-      );
-    } else{
-      int n = locations.length;
-      print("Count: $n");
-
-      widget = new GridView.count(
-        crossAxisCount: 2,
-        padding: new EdgeInsets.all(4.0),
-        children: 
-          locations.map((location) => 
-              new LocationCard(location)).toList(),
-      );
-    }
-
-    return widget;
-  }
-}
-
-
-class LocationCard extends StatelessWidget{
-  final Location _location;
-  var container;
-
-  LocationCard(this._location);
-
-  @override
-  Widget build(BuildContext context){
-    container = StateContainer.of(context);
-    return new Card(
-      child: new FlatButton(
-        onPressed: (){_gotoLocationDetail(context, _location);},
-        child: new Column(
-          children: <Widget>[
-            new Image.network(
-                _location.picture,
-                scale: 0.8,
-                height: 150.0,
-                width: 150.0),
-            new Text(_location.name)
-          ]
-        )
-      )
-    );
+  void _logout(){
+    _logOutPopUp();
   }
 
-  void _gotoLocationDetail(BuildContext context, Location location){
-    print(location.uid);
-    container.onFocusLocation = location;
-    
+  void refreshData(){
+    setState(() {
+      locations = new List<Location>();
+      isSearching = true;
+    });
+    locationListPresenter.loadLocations(container.user);
+  }
+
+  void _gotoAddLocationPage(BuildContext context){
     Navigator.push(
-      context, 
+      context,
       new MaterialPageRoute(
-        settings: new RouteSettings(name: LocationDetail.routeName),
-        builder: 
-          (context){
-            return new LocationDetail(location.uid);
-          }
+        settings: const RouteSettings(name: AddLocationPage.routeName),
+        builder: (context){
+          return new AddLocationPage();
+        }
       )
     );
   }

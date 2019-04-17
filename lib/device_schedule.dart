@@ -60,13 +60,10 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
           break;
         }
       }
-
       currentLocation.devices.removeWhere(
         (currentDevice) => currentDevice.uid == this.device.uid        
       );
-
       container.devices = currentLocation.devices;
-
       Navigator.of(context).pop();
     });
   }
@@ -98,7 +95,6 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   void _deleteDevice(){
     print("deleting device");
     popUpDeleteDevice();
-    Navigator.of(context).pop();
   }
 
   Future<Null> popUpDeleteDevice() async {
