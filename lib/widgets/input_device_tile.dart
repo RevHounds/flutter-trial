@@ -35,7 +35,7 @@ class InputDeviceTileState extends State<InputDeviceTile>{
         child:  new ListTile(
           leading: new Icon(Icons.lightbulb_outline),
           title: new Text(device.name),
-          subtitle: new Text(device.type),
+          subtitle: new Text("Input (" + device.port.toString() + ")"),
           trailing: new Text(
             (device.status) ? "TRUE" : "FALSE"
           )

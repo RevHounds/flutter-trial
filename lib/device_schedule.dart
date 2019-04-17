@@ -28,6 +28,42 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
   }
 
   @override
+  Widget build(BuildContext context){
+    container = StateContainer.of(context);
+
+    this.device = container.onFocusDevice; 
+    this.schedules = device.schedules;
+
+    var body;
+
+    if(isSearching){
+      body = new LoadingScreen();
+      presenter.loadSchedules(this.device);
+    } else{
+      body = new ListView(
+        children: _generateScheduleList(schedules)
+      );
+    }
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text(device.name + ' Detail'),
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: _deleteDevice,
+            )
+        ],
+      ),
+      body: body,
+      floatingActionButton: new FloatingActionButton(
+        child: new Icon(Icons.add),
+        onPressed: _addSchedule
+      ),
+    );
+  }
+
+  @override
   void initState(){
     super.initState();
     isSearching = true;
@@ -129,43 +165,6 @@ class DeviceDetailPageState extends State<DeviceDetailPage> implements DeviceDet
           ],
         );
       },
-    );
-  }
-  
-  @override
-  Widget build(BuildContext context){
-    container = StateContainer.of(context);
-
-    this.device = container.onFocusDevice; 
-    this.schedules = device.schedules;
-
-    var body;
-
-    if(isSearching){
-      body = new LoadingScreen();
-      presenter.loadSchedules(this.device);
-    } else{
-      body = new ListView(
-        children: _generateScheduleList(schedules)
-      );
-    }
-
-
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(device.name + ' Detail'),
-        actions: <Widget>[
-          new IconButton(
-            icon: new Icon(Icons.delete),
-            onPressed: _deleteDevice,
-            )
-        ],
-      ),
-      body: body,
-      floatingActionButton: new FloatingActionButton(
-        child: new Icon(Icons.add),
-        onPressed: _addSchedule
-      ),
     );
   }
 }

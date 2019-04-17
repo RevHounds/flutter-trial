@@ -47,7 +47,7 @@ class OutputDeviceTileState extends State<OutputDeviceTile> implements OutputDev
         child: new ListTile(
           leading: new Icon(Icons.lightbulb_outline),
           title: new Text(device.name),
-          subtitle: new Text(device.port.toString()),
+          subtitle: new Text("Output (" + device.port.toString() + ")"),
           trailing: new Switch(
             value: this.device.status,
             onChanged: (bool value){
