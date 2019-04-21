@@ -91,10 +91,9 @@ class RestGetway{
         print(res.toString());
         if(res["error"] == "false"){
           User user = new User.fromMap(res["user"]);
-          getToken(user).then((status){
-            if(status) print(status);
+          return getToken(user).then((status){
+            return Future.value(user);
           });
-          return Future.value(user);
         }
         Toaster.create("No user found!");
     });
@@ -117,12 +116,11 @@ class RestGetway{
           User user = new User.fromMap(res["user"]);    
           Toaster.create("Succeeded");
       
-          getToken(user).then(
+          return getToken(user).then(
             (status){
               if(status) print("yeay");
-            }
-          );          
-          return Future.value(user);
+              return Future.value(user);
+           });          
         } else{
           Toaster.create("Failed to create new User");
         }
@@ -131,6 +129,7 @@ class RestGetway{
   }
 
  Future<List<Location>> getLocations(User user) async {
+      print("getting location Id ");
       print(_userId);
       return NetworkUtils().post(getLocationUrl,
           body: {

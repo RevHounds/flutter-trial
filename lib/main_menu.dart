@@ -91,13 +91,16 @@ class MainMenuState extends State<MainMenu> implements LogoutContract, LocationL
 
   @override
   void onLogout(){
-    print("lagi logout");
-    Navigator.of(context).pushReplacement(
-      new MaterialPageRoute(
-        builder: (context){
-          return new LoginPage();
-        }
-      ));
+    setState(() {
+      print("MOVING ON");
+      Navigator.of(context).pushReplacement(
+        new MaterialPageRoute(
+          builder: (context){
+            return new LoginPage();
+          }
+        ));
+      print("MOVING OFF");
+    });
   }
   
 
@@ -127,7 +130,7 @@ class MainMenuState extends State<MainMenu> implements LogoutContract, LocationL
               child: new Text("Log out"),
               onPressed: () {
                 pref.setBool("isLoggedIn", false).then((state){
-                  print("logged off");
+                  print(state.toString());
                   mainMenuPresenter.logout();
                   Navigator.of(context).pop();
                 });
